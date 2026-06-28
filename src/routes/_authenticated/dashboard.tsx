@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { AppHeader } from "@/components/AppHeader";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -60,9 +60,8 @@ function Dashboard() {
   const firstName = profile?.full_name?.split(" ")[0] ?? user.email?.split("@")[0] ?? "there";
 
   return (
-    <div className="min-h-screen bg-background">
-      <AppHeader />
-      <main className="mx-auto max-w-7xl px-6 py-10">
+    <main className="mx-auto max-w-7xl px-6 py-10">
+
         {/* Hero */}
         <section className="relative overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-primary/10 via-primary-soft/40 to-background p-6 sm:p-8">
           <div className="absolute -right-12 -top-12 h-48 w-48 rounded-full bg-primary/10 blur-3xl" aria-hidden />
@@ -128,9 +127,7 @@ function Dashboard() {
               <ActionTile to="/applications" icon={FileText} title="My applications" desc="Track the status of every application." />
             </div>
           </>
-        )}
       </main>
-    </div>
   );
 }
 

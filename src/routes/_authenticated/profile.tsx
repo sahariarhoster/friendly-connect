@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { AppHeader } from "@/components/AppHeader";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -55,9 +55,7 @@ function ProfilePage() {
   });
 
   return (
-    <div className="min-h-screen bg-background">
-      <AppHeader />
-      <main className="mx-auto max-w-2xl px-6 py-10">
+    <main className="mx-auto max-w-2xl px-6 py-10">
         <h1 className="text-3xl font-bold tracking-tight text-foreground">My profile</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Keep your contact details up to date — these are used when you apply for jobs.
@@ -99,7 +97,6 @@ function ProfilePage() {
             </div>
           </CardContent>
         </Card>
-      </main>
-    </div>
+    </main>
   );
 }
