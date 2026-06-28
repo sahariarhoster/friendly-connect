@@ -13,10 +13,11 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { POSITION_LABELS, CUSTOM_FIELDS, type PositionType, type CustomField } from "@/lib/positions";
+import { BASE_FIELD_LABELS, BASE_FIELD_DEFAULTS, getBaseField, type BaseFieldKey, type BaseFieldsConfig } from "@/lib/baseFields";
 import { useDepartments } from "@/hooks/useDepartments";
 import { useOffices } from "@/hooks/useOffices";
 import { QuestionsDialog } from "@/components/QuestionsDialog";
-import { Plus, Pencil, Trash2, Link2, Briefcase, ListChecks } from "lucide-react";
+import { Plus, Pencil, Trash2, Link2, Briefcase, ListChecks, FileText } from "lucide-react";
 import { PageHeader, EmptyState } from "@/components/PageHeader";
 import { toast } from "sonner";
 
