@@ -215,11 +215,14 @@ function JobDialog({
   saving: boolean;
 }) {
   const { data: departments = [] } = useDepartments();
+  const { data: offices = [] } = useOffices();
   if (!editing) return null;
   const set = (k: keyof JobRow, v: unknown) => setEditing({ ...editing, [k]: v });
   const fields = editing.custom_fields ?? [];
   const setFields = (next: CustomField[]) => set("custom_fields", next);
-  const defaults = CUSTOM_FIELDS[(editing.position_type ?? "other") as PositionType] ?? [];
+  const positionDefaults = CUSTOM_FIELDS[(editing.position_type ?? "other") as PositionType] ?? [];
+  const selectedDept = departments.find((d) => d.name === editing.department);
+  const departmentDefaults = selectedDept?.custom_fields ?? [];
 
   return (
     <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
@@ -270,8 +273,8 @@ function JobDialog({
             <Select value={editing.location ?? ""} onValueChange={(v) => set("location", v)}>
               <SelectTrigger><SelectValue placeholder="Select office" /></SelectTrigger>
               <SelectContent>
-                {OFFICES.map((o) => (
-                  <SelectItem key={o} value={o}>{o}</SelectItem>
+                {offices.map((o) => (
+                  <SelectItem key={o.id} value={o.name}>{o.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
