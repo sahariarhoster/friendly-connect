@@ -79,7 +79,20 @@ function JobsPage() {
         </div>
 
         {isLoading ? (
-          <p className="text-muted-foreground">Loading…</p>
+          <div className="grid gap-4 md:grid-cols-2">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Card key={i}>
+                <CardHeader>
+                  <Skeleton className="h-5 w-2/3" />
+                  <Skeleton className="mt-2 h-4 w-1/3" />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="mt-2 h-4 w-5/6" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         ) : filtered.length === 0 ? (
           <Card>
             <CardContent className="py-16 text-center text-muted-foreground">
