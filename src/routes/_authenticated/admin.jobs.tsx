@@ -83,6 +83,7 @@ function AdminJobs() {
         custom_fields: (job.custom_fields ?? []) as unknown as never,
         use_position_defaults: job.use_position_defaults ?? true,
         use_department_defaults: job.use_department_defaults ?? true,
+        base_fields: (job.base_fields ?? {}) as unknown as never,
       };
       if (job.id) {
         const { error } = await supabase.from("jobs").update(payload).eq("id", job.id);
