@@ -14,6 +14,116 @@ export type Database = {
   }
   public: {
     Tables: {
+      job_applications: {
+        Row: {
+          admin_notes: string | null
+          applicant_id: string
+          cover_letter: string | null
+          created_at: string
+          custom_responses: Json
+          email: string
+          full_name: string
+          id: string
+          job_id: string
+          phone: string | null
+          portfolio_url: string | null
+          resume_url: string | null
+          status: Database["public"]["Enums"]["application_status"]
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          applicant_id: string
+          cover_letter?: string | null
+          created_at?: string
+          custom_responses?: Json
+          email: string
+          full_name: string
+          id?: string
+          job_id: string
+          phone?: string | null
+          portfolio_url?: string | null
+          resume_url?: string | null
+          status?: Database["public"]["Enums"]["application_status"]
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          applicant_id?: string
+          cover_letter?: string | null
+          created_at?: string
+          custom_responses?: Json
+          email?: string
+          full_name?: string
+          id?: string
+          job_id?: string
+          phone?: string | null
+          portfolio_url?: string | null
+          resume_url?: string | null
+          status?: Database["public"]["Enums"]["application_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_applications_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      jobs: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          deadline: string | null
+          department: string | null
+          description: string
+          employment_type: string | null
+          id: string
+          location: string | null
+          position_type: Database["public"]["Enums"]["position_type"]
+          requirements: string | null
+          salary_range: string | null
+          status: Database["public"]["Enums"]["job_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          deadline?: string | null
+          department?: string | null
+          description: string
+          employment_type?: string | null
+          id?: string
+          location?: string | null
+          position_type?: Database["public"]["Enums"]["position_type"]
+          requirements?: string | null
+          salary_range?: string | null
+          status?: Database["public"]["Enums"]["job_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          deadline?: string | null
+          department?: string | null
+          description?: string
+          employment_type?: string | null
+          id?: string
+          location?: string | null
+          position_type?: Database["public"]["Enums"]["position_type"]
+          requirements?: string | null
+          salary_range?: string | null
+          status?: Database["public"]["Enums"]["job_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -74,6 +184,22 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "applicant"
+      application_status:
+        | "pending"
+        | "reviewing"
+        | "shortlisted"
+        | "interviewed"
+        | "rejected"
+        | "hired"
+      job_status: "draft" | "open" | "closed"
+      position_type:
+        | "video_editor"
+        | "social_media_manager"
+        | "graphic_designer"
+        | "content_writer"
+        | "developer"
+        | "marketing"
+        | "other"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -202,6 +328,24 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "applicant"],
+      application_status: [
+        "pending",
+        "reviewing",
+        "shortlisted",
+        "interviewed",
+        "rejected",
+        "hired",
+      ],
+      job_status: ["draft", "open", "closed"],
+      position_type: [
+        "video_editor",
+        "social_media_manager",
+        "graphic_designer",
+        "content_writer",
+        "developer",
+        "marketing",
+        "other",
+      ],
     },
   },
 } as const
