@@ -15,9 +15,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { POSITION_LABELS, CUSTOM_FIELDS, type PositionType, type CustomField } from "@/lib/positions";
 import { useDepartments } from "@/hooks/useDepartments";
 import { useOffices } from "@/hooks/useOffices";
-import { FieldList } from "@/components/FieldEditor";
-import { Plus, Pencil, Trash2, Link2, Briefcase } from "lucide-react";
-import { PageHeader } from "@/components/PageHeader";
+import { QuestionsDialog } from "@/components/QuestionsDialog";
+import { Plus, Pencil, Trash2, Link2, Briefcase, ListChecks } from "lucide-react";
+import { PageHeader, EmptyState } from "@/components/PageHeader";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/jobs")({
