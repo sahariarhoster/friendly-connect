@@ -317,11 +317,24 @@ function JobDialog({
             </div>
           </div>
 
-          {defaults.length > 0 && (
+          {departmentDefaults.length > 0 && (
+            <div className="flex items-center justify-between rounded-md border border-border bg-background p-3">
+              <div>
+                <div className="text-sm font-medium">Include {selectedDept?.name} default questions</div>
+                <div className="text-xs text-muted-foreground">{departmentDefaults.map((d) => d.label).join(" · ")}</div>
+              </div>
+              <Switch
+                checked={editing.use_department_defaults ?? true}
+                onCheckedChange={(v) => set("use_department_defaults", v)}
+              />
+            </div>
+          )}
+
+          {positionDefaults.length > 0 && (
             <div className="flex items-center justify-between rounded-md border border-border bg-background p-3">
               <div>
                 <div className="text-sm font-medium">Include {POSITION_LABELS[editing.position_type as PositionType]} default questions</div>
-                <div className="text-xs text-muted-foreground">{defaults.map((d) => d.label).join(" · ")}</div>
+                <div className="text-xs text-muted-foreground">{positionDefaults.map((d) => d.label).join(" · ")}</div>
               </div>
               <Switch
                 checked={editing.use_position_defaults ?? true}
@@ -330,40 +343,10 @@ function JobDialog({
             </div>
           )}
 
-          <div className="space-y-3">
-            {fields.length === 0 && (
-              <p className="text-xs text-muted-foreground">No custom questions yet. Add one below.</p>
-            )}
-            {fields.map((f, i) => (
-              <FieldEditor
-                key={i}
-                field={f}
-                onChange={(next) => setFields(fields.map((x, idx) => (idx === i ? next : x)))}
-                onRemove={() => setFields(fields.filter((_, idx) => idx !== i))}
-                onMove={(dir) => {
-                  const j = i + dir;
-                  if (j < 0 || j >= fields.length) return;
-                  const next = [...fields];
-                  [next[i], next[j]] = [next[j], next[i]];
-                  setFields(next);
-                }}
-              />
-            ))}
+          <div>
+            <div className="mb-2 text-sm font-medium">Extra questions for this job</div>
+            <FieldList fields={fields} onChange={setFields} />
           </div>
-
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() =>
-              setFields([
-                ...fields,
-                { key: `q_${fields.length + 1}_${Math.random().toString(36).slice(2, 6)}`, label: "", type: "text", required: false },
-              ])
-            }
-          >
-            <Plus className="mr-1 h-4 w-4" /> Add question
-          </Button>
         </div>
       </div>
       <DialogFooter>
