@@ -10,7 +10,10 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { APPLICATION_STATUSES, STATUS_LABELS } from "@/lib/positions";
+import { PageHeader, EmptyState } from "@/components/PageHeader";
+import { Inbox } from "lucide-react";
 import { toast } from "sonner";
+
 
 export const Route = createFileRoute("/_authenticated/admin/applications")({
   component: AdminApplications,
@@ -77,12 +80,14 @@ function AdminApplications() {
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-foreground">Applications</h1>
-        <p className="text-sm text-muted-foreground">Review applicants and move them through the pipeline.</p>
-      </div>
+      <PageHeader
+        icon={Inbox}
+        eyebrow="Admin · Applications"
+        title="Review applicants"
+        description="Move candidates through the pipeline: pending → shortlisted → interviewed → hired."
+      />
 
-      <div className="mb-4 flex flex-wrap gap-3">
+      <div className="mb-4 mt-6 flex flex-wrap gap-3">
         <Select value={jobFilter} onValueChange={setJobFilter}>
           <SelectTrigger className="w-64"><SelectValue placeholder="All jobs" /></SelectTrigger>
           <SelectContent>
@@ -104,8 +109,9 @@ function AdminApplications() {
           {isLoading ? (
             <p className="p-6 text-muted-foreground">Loading…</p>
           ) : filtered.length === 0 ? (
-            <p className="p-6 text-muted-foreground">No applications match these filters.</p>
+            <EmptyState icon={Inbox} title="No applications match" description="Try clearing the filters above." />
           ) : (
+
             <Table>
               <TableHeader>
                 <TableRow>

@@ -16,7 +16,8 @@ import { POSITION_LABELS, CUSTOM_FIELDS, type PositionType, type CustomField } f
 import { useDepartments } from "@/hooks/useDepartments";
 import { useOffices } from "@/hooks/useOffices";
 import { FieldList } from "@/components/FieldEditor";
-import { Plus, Pencil, Trash2, Link2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Link2, Briefcase } from "lucide-react";
+import { PageHeader } from "@/components/PageHeader";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/jobs")({
@@ -124,25 +125,28 @@ function AdminJobs() {
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-8">
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Job posts</h1>
-          <p className="text-sm text-muted-foreground">Create, edit, and publish vacancies.</p>
-        </div>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={openNew}><Plus className="mr-1 h-4 w-4" /> New job</Button>
-          </DialogTrigger>
-          <JobDialog
-            editing={editing}
-            setEditing={setEditing}
-            onSubmit={() => editing && save.mutate(editing)}
-            saving={save.isPending}
-          />
-        </Dialog>
-      </div>
+      <PageHeader
+        icon={Briefcase}
+        eyebrow="Admin · Job posts"
+        title="Manage vacancies"
+        description="Create, edit, and publish job posts. Copy the public apply link to share anywhere."
+        actions={
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+              <Button onClick={openNew}><Plus className="mr-1 h-4 w-4" /> New job</Button>
+            </DialogTrigger>
+            <JobDialog
+              editing={editing}
+              setEditing={setEditing}
+              onSubmit={() => editing && save.mutate(editing)}
+              saving={save.isPending}
+            />
+          </Dialog>
+        }
+      />
 
-      <Card>
+      <Card className="mt-6">
+
         <CardContent className="p-0">
           {isLoading ? (
             <p className="p-6 text-muted-foreground">Loading…</p>

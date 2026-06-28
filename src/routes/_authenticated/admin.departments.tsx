@@ -11,7 +11,8 @@ import { Badge } from "@/components/ui/badge";
 import { useDepartments, type Department } from "@/hooks/useDepartments";
 import { FieldList } from "@/components/FieldEditor";
 import type { CustomField } from "@/lib/positions";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Building2 } from "lucide-react";
+import { PageHeader } from "@/components/PageHeader";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/departments")({
@@ -55,14 +56,15 @@ function AdminDepartments() {
 
   return (
     <main className="mx-auto max-w-4xl px-6 py-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-foreground">Departments</h1>
-        <p className="text-sm text-muted-foreground">
-          Manage departments and the default application form questions for each.
-        </p>
-      </div>
+      <PageHeader
+        icon={Building2}
+        eyebrow="Admin · Departments"
+        title="Departments & form templates"
+        description="Manage departments and the default application form questions for each."
+      />
 
-      <Card className="mb-6">
+      <Card className="mb-6 mt-6">
+
         <CardContent className="flex gap-2 p-4">
           <Input
             placeholder="New department name…"

@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { PageHeader } from "@/components/PageHeader";
+import { UserCircle } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   component: ProfilePage,
@@ -55,48 +57,51 @@ function ProfilePage() {
   });
 
   return (
-    <main className="mx-auto max-w-2xl px-6 py-10">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">My profile</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Keep your contact details up to date — these are used when you apply for jobs.
-        </p>
+    <main className="mx-auto max-w-2xl px-6 py-8">
+      <PageHeader
+        icon={UserCircle}
+        eyebrow="Profile"
+        title="Your account details"
+        description="Keep your contact details up to date — these are used when you apply for jobs."
+      />
 
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle>Account details</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-1.5">
-              <Label>Email</Label>
-              <Input value={user.email ?? ""} disabled />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="full_name">Full name</Label>
-              <Input
-                id="full_name"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder="Your name"
-                disabled={isLoading}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="phone">Phone</Label>
-              <Input
-                id="phone"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+880 ..."
-                disabled={isLoading}
-              />
-            </div>
-            <div className="pt-2">
-              <Button onClick={() => save.mutate()} disabled={save.isPending || isLoading}>
-                {save.isPending ? "Saving…" : "Save changes"}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+      <Card className="mt-8">
+        <CardHeader>
+          <CardTitle>Account details</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-1.5">
+            <Label>Email</Label>
+            <Input value={user.email ?? ""} disabled />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="full_name">Full name</Label>
+            <Input
+              id="full_name"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder="Your name"
+              disabled={isLoading}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="phone">Phone</Label>
+            <Input
+              id="phone"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="+880 ..."
+              disabled={isLoading}
+            />
+          </div>
+          <div className="pt-2">
+            <Button onClick={() => save.mutate()} disabled={save.isPending || isLoading}>
+              {save.isPending ? "Saving…" : "Save changes"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </main>
   );
 }
+
