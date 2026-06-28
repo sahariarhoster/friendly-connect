@@ -14,12 +14,12 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as JobsIndexRouteImport } from './routes/jobs.index'
 import { Route as JobsJobIdRouteImport } from './routes/jobs.$jobId'
+import { Route as ApplyJobIdRouteImport } from './routes/apply.$jobId'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedApplicationsRouteImport } from './routes/_authenticated/applications'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
-import { Route as AuthenticatedApplyJobIdRouteImport } from './routes/_authenticated/apply.$jobId'
 import { Route as AuthenticatedAdminJobsRouteImport } from './routes/_authenticated/admin.jobs'
 import { Route as AuthenticatedAdminApplicationsRouteImport } from './routes/_authenticated/admin.applications'
 
@@ -45,6 +45,11 @@ const JobsIndexRoute = JobsIndexRouteImport.update({
 const JobsJobIdRoute = JobsJobIdRouteImport.update({
   id: '/jobs/$jobId',
   path: '/jobs/$jobId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApplyJobIdRoute = ApplyJobIdRouteImport.update({
+  id: '/apply/$jobId',
+  path: '/apply/$jobId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
@@ -73,11 +78,6 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
-const AuthenticatedApplyJobIdRoute = AuthenticatedApplyJobIdRouteImport.update({
-  id: '/apply/$jobId',
-  path: '/apply/$jobId',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedAdminJobsRoute = AuthenticatedAdminJobsRouteImport.update({
   id: '/jobs',
   path: '/jobs',
@@ -97,11 +97,11 @@ export interface FileRoutesByFullPath {
   '/applications': typeof AuthenticatedApplicationsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/apply/$jobId': typeof ApplyJobIdRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/jobs/': typeof JobsIndexRoute
   '/admin/applications': typeof AuthenticatedAdminApplicationsRoute
   '/admin/jobs': typeof AuthenticatedAdminJobsRoute
-  '/apply/$jobId': typeof AuthenticatedApplyJobIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -110,11 +110,11 @@ export interface FileRoutesByTo {
   '/applications': typeof AuthenticatedApplicationsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/apply/$jobId': typeof ApplyJobIdRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/jobs': typeof JobsIndexRoute
   '/admin/applications': typeof AuthenticatedAdminApplicationsRoute
   '/admin/jobs': typeof AuthenticatedAdminJobsRoute
-  '/apply/$jobId': typeof AuthenticatedApplyJobIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesById {
@@ -126,11 +126,11 @@ export interface FileRoutesById {
   '/_authenticated/applications': typeof AuthenticatedApplicationsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/apply/$jobId': typeof ApplyJobIdRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/jobs/': typeof JobsIndexRoute
   '/_authenticated/admin/applications': typeof AuthenticatedAdminApplicationsRoute
   '/_authenticated/admin/jobs': typeof AuthenticatedAdminJobsRoute
-  '/_authenticated/apply/$jobId': typeof AuthenticatedApplyJobIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -142,11 +142,11 @@ export interface FileRouteTypes {
     | '/applications'
     | '/dashboard'
     | '/profile'
+    | '/apply/$jobId'
     | '/jobs/$jobId'
     | '/jobs/'
     | '/admin/applications'
     | '/admin/jobs'
-    | '/apply/$jobId'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -155,11 +155,11 @@ export interface FileRouteTypes {
     | '/applications'
     | '/dashboard'
     | '/profile'
+    | '/apply/$jobId'
     | '/jobs/$jobId'
     | '/jobs'
     | '/admin/applications'
     | '/admin/jobs'
-    | '/apply/$jobId'
     | '/admin'
   id:
     | '__root__'
@@ -170,11 +170,11 @@ export interface FileRouteTypes {
     | '/_authenticated/applications'
     | '/_authenticated/dashboard'
     | '/_authenticated/profile'
+    | '/apply/$jobId'
     | '/jobs/$jobId'
     | '/jobs/'
     | '/_authenticated/admin/applications'
     | '/_authenticated/admin/jobs'
-    | '/_authenticated/apply/$jobId'
     | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -182,6 +182,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ApplyJobIdRoute: typeof ApplyJobIdRoute
   JobsJobIdRoute: typeof JobsJobIdRoute
   JobsIndexRoute: typeof JobsIndexRoute
 }
@@ -223,6 +224,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JobsJobIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/apply/$jobId': {
+      id: '/apply/$jobId'
+      path: '/apply/$jobId'
+      fullPath: '/apply/$jobId'
+      preLoaderRoute: typeof ApplyJobIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
       path: '/profile'
@@ -257,13 +265,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/apply/$jobId': {
-      id: '/_authenticated/apply/$jobId'
-      path: '/apply/$jobId'
-      fullPath: '/apply/$jobId'
-      preLoaderRoute: typeof AuthenticatedApplyJobIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/jobs': {
       id: '/_authenticated/admin/jobs'
@@ -302,7 +303,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedApplicationsRoute: typeof AuthenticatedApplicationsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
-  AuthenticatedApplyJobIdRoute: typeof AuthenticatedApplyJobIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -310,7 +310,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedApplicationsRoute: AuthenticatedApplicationsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
-  AuthenticatedApplyJobIdRoute: AuthenticatedApplyJobIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -320,6 +319,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ApplyJobIdRoute: ApplyJobIdRoute,
   JobsJobIdRoute: JobsJobIdRoute,
   JobsIndexRoute: JobsIndexRoute,
 }
