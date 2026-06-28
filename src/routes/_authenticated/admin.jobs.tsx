@@ -145,17 +145,21 @@ function AdminJobs() {
         }
       />
 
-      <Card className="mt-6">
-
+      <Card className="mt-6 overflow-hidden border-border/70">
         <CardContent className="p-0">
           {isLoading ? (
             <p className="p-6 text-muted-foreground">Loading…</p>
           ) : (jobs ?? []).length === 0 ? (
-            <p className="p-6 text-muted-foreground">No jobs yet. Create your first vacancy.</p>
+            <EmptyState
+              icon={Briefcase}
+              title="No jobs yet"
+              description="Create your first vacancy to start collecting applications."
+              action={<Button onClick={openNew} className="gap-2"><Plus className="h-4 w-4" /> New job</Button>}
+            />
           ) : (
             <Table>
               <TableHeader>
-                <TableRow>
+                <TableRow className="bg-muted/40 hover:bg-muted/40">
                   <TableHead>Title</TableHead>
                   <TableHead>Position</TableHead>
                   <TableHead>Status</TableHead>
@@ -165,18 +169,27 @@ function AdminJobs() {
               </TableHeader>
               <TableBody>
                 {jobs!.map((j) => (
-                  <TableRow key={j.id}>
+                  <TableRow key={j.id} className="hover:bg-muted/30">
                     <TableCell>
-                      <div className="font-medium">{j.title}</div>
-                      <div className="text-xs text-muted-foreground">{j.department}{j.location ? ` • ${j.location}` : ""}</div>
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-soft text-primary">
+                          <Briefcase className="h-4 w-4" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="font-medium">{j.title}</div>
+                          <div className="text-xs text-muted-foreground">{j.department}{j.location ? ` • ${j.location}` : ""}</div>
+                        </div>
+                      </div>
                     </TableCell>
-                    <TableCell>{POSITION_LABELS[j.position_type as PositionType]}</TableCell>
                     <TableCell>
-                      <Badge variant={j.status === "open" ? "default" : j.status === "closed" ? "destructive" : "secondary"}>
+                      <Badge variant="outline" className="font-medium">{POSITION_LABELS[j.position_type as PositionType]}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={j.status === "open" ? "default" : j.status === "closed" ? "destructive" : "secondary"} className="capitalize">
                         {j.status}
                       </Badge>
                     </TableCell>
-                    <TableCell>{j.deadline ? new Date(j.deadline).toLocaleDateString() : "—"}</TableCell>
+                    <TableCell className="text-sm text-muted-foreground">{j.deadline ? new Date(j.deadline).toLocaleDateString() : "—"}</TableCell>
                     <TableCell className="text-right">
                       <Button
                         variant="ghost"
@@ -206,6 +219,7 @@ function AdminJobs() {
           )}
         </CardContent>
       </Card>
+
     </main>
   );
 }
@@ -313,19 +327,33 @@ function JobDialog({
         </div>
 
         {/* Form builder */}
-        <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-4">
+        <div className="rounded-xl border border-border bg-gradient-to-br from-primary-soft/40 to-card p-5 space-y-4">
           <div className="flex items-start justify-between gap-3">
-            <div>
-              <h3 className="font-semibold text-foreground">Application form questions</h3>
-              <p className="text-xs text-muted-foreground">Customize what applicants are asked for this role.</p>
+            <div className="flex items-start gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
+                <ListChecks className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground">Application form</h3>
+                <p className="text-xs text-muted-foreground">
+                  Pick which question sets applicants see for this role.
+                </p>
+              </div>
             </div>
+            <QuestionsDialog
+              fields={fields}
+              onSave={setFields}
+              title="Job-specific questions"
+              description="These questions are added on top of the department and position defaults."
+              triggerLabel="Edit job questions"
+            />
           </div>
 
           {departmentDefaults.length > 0 && (
-            <div className="flex items-center justify-between rounded-md border border-border bg-background p-3">
-              <div>
-                <div className="text-sm font-medium">Include {selectedDept?.name} default questions</div>
-                <div className="text-xs text-muted-foreground">{departmentDefaults.map((d) => d.label).join(" · ")}</div>
+            <div className="flex items-center justify-between rounded-lg border border-border bg-card p-3">
+              <div className="min-w-0">
+                <div className="text-sm font-medium">Include {selectedDept?.name} defaults</div>
+                <div className="truncate text-xs text-muted-foreground">{departmentDefaults.map((d) => d.label).join(" · ")}</div>
               </div>
               <Switch
                 checked={editing.use_department_defaults ?? true}
@@ -335,10 +363,10 @@ function JobDialog({
           )}
 
           {positionDefaults.length > 0 && (
-            <div className="flex items-center justify-between rounded-md border border-border bg-background p-3">
-              <div>
-                <div className="text-sm font-medium">Include {POSITION_LABELS[editing.position_type as PositionType]} default questions</div>
-                <div className="text-xs text-muted-foreground">{positionDefaults.map((d) => d.label).join(" · ")}</div>
+            <div className="flex items-center justify-between rounded-lg border border-border bg-card p-3">
+              <div className="min-w-0">
+                <div className="text-sm font-medium">Include {POSITION_LABELS[editing.position_type as PositionType]} defaults</div>
+                <div className="truncate text-xs text-muted-foreground">{positionDefaults.map((d) => d.label).join(" · ")}</div>
               </div>
               <Switch
                 checked={editing.use_position_defaults ?? true}
@@ -347,11 +375,17 @@ function JobDialog({
             </div>
           )}
 
-          <div>
-            <div className="mb-2 text-sm font-medium">Extra questions for this job</div>
-            <FieldList fields={fields} onChange={setFields} />
+          <div className="flex items-center justify-between rounded-lg border border-dashed border-border bg-card/60 p-3">
+            <div>
+              <div className="text-sm font-medium">Extra questions for this job</div>
+              <div className="text-xs text-muted-foreground">
+                {fields.length === 0 ? "No custom questions added" : `${fields.length} custom question${fields.length === 1 ? "" : "s"}`}
+              </div>
+            </div>
+            <QuestionsDialog fields={fields} onSave={setFields} triggerLabel="Manage" />
           </div>
         </div>
+
       </div>
       <DialogFooter>
         <Button onClick={onSubmit} disabled={saving || !editing.title || !editing.description}>
