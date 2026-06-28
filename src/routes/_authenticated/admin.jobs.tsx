@@ -12,9 +12,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { POSITION_LABELS, OFFICES, CUSTOM_FIELDS, type PositionType, type CustomField, type CustomFieldType } from "@/lib/positions";
+import { POSITION_LABELS, CUSTOM_FIELDS, type PositionType, type CustomField } from "@/lib/positions";
 import { useDepartments } from "@/hooks/useDepartments";
-import { Plus, Pencil, Trash2, Link2, GripVertical } from "lucide-react";
+import { useOffices } from "@/hooks/useOffices";
+import { FieldList } from "@/components/FieldEditor";
+import { Plus, Pencil, Trash2, Link2 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/jobs")({
