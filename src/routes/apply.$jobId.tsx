@@ -113,22 +113,22 @@ function ApplyPage() {
 
   if (isLoading || !job) {
     return (
-      <div className="min-h-screen bg-background">
-        <AppHeader />
+      <AppShell>
         <div className="mx-auto max-w-3xl px-6 py-16 text-center text-muted-foreground">Loading…</div>
-      </div>
+      </AppShell>
     );
   }
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-background">
-        <AppHeader />
+      <AppShell>
         <div className="mx-auto max-w-2xl px-6 py-20 text-center">
-          <CheckCircle2 className="mx-auto h-14 w-14 text-primary" />
-          <h1 className="mt-4 text-3xl font-bold">Application received</h1>
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-soft text-primary">
+            <CheckCircle2 className="h-8 w-8" />
+          </div>
+          <h1 className="mt-5 text-3xl font-bold">Application received</h1>
           <p className="mt-2 text-muted-foreground">Thanks for applying to {String(job.title)}. We'll be in touch.</p>
-          <div className="mt-6 flex justify-center gap-3">
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
             <Link to="/jobs"><Button variant="outline">Browse more roles</Button></Link>
             {user && <Link to="/applications"><Button>Track my applications</Button></Link>}
             {!user && (
@@ -138,7 +138,7 @@ function ApplyPage() {
             )}
           </div>
         </div>
-      </div>
+      </AppShell>
     );
   }
 
@@ -146,12 +146,14 @@ function ApplyPage() {
   const posType = job.position_type as PositionType;
 
   return (
-    <div className="min-h-screen bg-background">
-      <AppHeader />
-      <main className="mx-auto max-w-3xl px-6 py-10">
-        <Link to="/jobs/$jobId" params={{ jobId }} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+    <AppShell>
+      <div className="p-4 sm:p-6 lg:p-8">
+        <main className="mx-auto max-w-3xl">
+        <Link to="/jobs/$jobId" params={{ jobId }} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary">
           <ArrowLeft className="h-4 w-4" /> Back to job
         </Link>
+
+
 
         <Card className="mt-6">
           <CardHeader>
