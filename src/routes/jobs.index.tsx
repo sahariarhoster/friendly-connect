@@ -8,7 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { POSITION_LABELS, DEPARTMENTS, type PositionType } from "@/lib/positions";
+import { POSITION_LABELS, type PositionType } from "@/lib/positions";
+import { useDepartments } from "@/hooks/useDepartments";
 import { Briefcase, MapPin, Clock } from "lucide-react";
 
 export const Route = createFileRoute("/jobs/")({
@@ -27,6 +28,7 @@ function JobsPage() {
   const [search, setSearch] = useState("");
   const [posType, setPosType] = useState<string>("all");
   const [dept, setDept] = useState<string>("all");
+  const { data: departments = [] } = useDepartments();
 
   const { data: jobs, isLoading } = useQuery({
     queryKey: ["public-jobs"],
@@ -85,8 +87,8 @@ function JobsPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All departments</SelectItem>
-              {DEPARTMENTS.map((d) => (
-                <SelectItem key={d} value={d}>{d}</SelectItem>
+              {departments.map((d) => (
+                <SelectItem key={d.id} value={d.name}>{d.name}</SelectItem>
               ))}
             </SelectContent>
           </Select>
