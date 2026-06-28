@@ -9,8 +9,8 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { useDepartments, type Department } from "@/hooks/useDepartments";
 import { QuestionsDialog } from "@/components/QuestionsDialog";
-import type { CustomField } from "@/lib/positions";
-import { Plus, Trash2, Building2, ListChecks } from "lucide-react";
+import { type CustomField, getDepartmentDefaults } from "@/lib/positions";
+import { Plus, Trash2, Building2, ListChecks, Sparkles } from "lucide-react";
 import { PageHeader, EmptyState } from "@/components/PageHeader";
 import { toast } from "sonner";
 
@@ -105,6 +105,8 @@ function DepartmentCard({
 }) {
   const [name, setName] = useState(dept.name);
   const fields: CustomField[] = dept.custom_fields ?? [];
+  const suggested = getDepartmentDefaults(dept.name);
+  const showSuggested = fields.length === 0 && suggested.length > 0;
 
   return (
     <Card className="overflow-hidden border-border/70 transition-shadow hover:shadow-md">
@@ -147,20 +149,61 @@ function DepartmentCard({
           </Button>
         </div>
 
-        <div className="flex items-center justify-between rounded-lg border border-dashed border-border bg-muted/30 p-3">
-          <div className="min-w-0">
-            <div className="text-sm font-medium">Default questions</div>
-            <div className="truncate text-xs text-muted-foreground">
-              {fields.length === 0 ? "No questions set" : fields.map((f) => f.label || "Untitled").join(" · ")}
+        <div className="space-y-2 rounded-lg border border-dashed border-border bg-muted/30 p-3">
+          <div className="flex items-center justify-between gap-2">
+            <div className="min-w-0">
+              <div className="text-sm font-medium">Default questions</div>
+              <div className="text-xs text-muted-foreground">
+                {fields.length === 0
+                  ? showSuggested ? "Suggested template below — not yet saved" : "No questions set"
+                  : `${fields.length} active`}
+              </div>
             </div>
+            <QuestionsDialog
+              fields={fields}
+              onSave={(next) => onSave({ custom_fields: next })}
+              title={`${dept.name} default questions`}
+              description="These questions are added to every job in this department."
+              triggerLabel="Manage"
+            />
           </div>
-          <QuestionsDialog
-            fields={fields}
-            onSave={(next) => onSave({ custom_fields: next })}
-            title={`${dept.name} default questions`}
-            description="These questions are added to every job in this department."
-            triggerLabel="Manage"
-          />
+
+          {fields.length > 0 && (
+            <ul className="space-y-1 text-xs text-foreground/80">
+              {fields.map((f, i) => (
+                <li key={i} className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                  <span className="truncate">{f.label || "Untitled"}</span>
+                  {f.required && <span className="text-[10px] text-primary">*</span>}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {showSuggested && (
+            <div className="space-y-2 rounded-md border border-primary/30 bg-primary-soft/40 p-2">
+              <div className="flex items-center gap-1.5 text-xs font-medium text-primary">
+                <Sparkles className="h-3 w-3" /> Suggested for {dept.name}
+              </div>
+              <ul className="space-y-1 text-xs text-foreground/80">
+                {suggested.map((f, i) => (
+                  <li key={i} className="flex items-center gap-2">
+                    <span className="h-1.5 w-1.5 rounded-full bg-primary/60" />
+                    <span className="truncate">{f.label}</span>
+                    {f.required && <span className="text-[10px] text-primary">*</span>}
+                  </li>
+                ))}
+              </ul>
+              <Button
+                size="sm"
+                variant="outline"
+                className="w-full gap-1"
+                onClick={() => onSave({ custom_fields: suggested })}
+              >
+                <Sparkles className="h-3 w-3" /> Use these defaults
+              </Button>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

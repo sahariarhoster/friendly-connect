@@ -59,6 +59,54 @@ export const CUSTOM_FIELDS: Record<PositionType, CustomField[]> = {
   other: [],
 };
 
+// Prebuilt default questions per department (matched by lowercased name)
+export const DEPARTMENT_DEFAULTS: Record<string, CustomField[]> = {
+  finance: [
+    { key: "fin_qualification", label: "Highest accounting qualification (CA, ACCA, CMA, MBA…)", type: "text", required: true },
+    { key: "fin_software", label: "Accounting software you use (Tally, QuickBooks, SAP…)", type: "text", required: true },
+    { key: "fin_years", label: "Years of finance/accounting experience", type: "number", required: true },
+  ],
+  "human resources": [
+    { key: "hr_specialty", label: "HR specialty (recruiting, L&D, ops, generalist…)", type: "text", required: true },
+    { key: "hr_team_size", label: "Largest team size you've supported", type: "number" },
+    { key: "hr_tools", label: "HR tools you've used (BambooHR, Workday, etc.)", type: "text" },
+  ],
+  marketing: [
+    { key: "mk_specialty", label: "Specialty (SEO, paid ads, content, growth…)", type: "text", required: true },
+    { key: "mk_result", label: "A campaign result you're proud of", type: "textarea", required: true },
+    { key: "mk_portfolio", label: "Portfolio / case study URL", type: "url" },
+  ],
+  operations: [
+    { key: "ops_scope", label: "Operations scope you've handled", type: "textarea", required: true },
+    { key: "ops_tools", label: "Tools you use (Notion, Asana, ERP…)", type: "text" },
+    { key: "ops_years", label: "Years of ops experience", type: "number", required: true },
+  ],
+  product: [
+    { key: "pr_scope", label: "Products you've shipped (links if possible)", type: "textarea", required: true },
+    { key: "pr_methods", label: "Frameworks you use (JTBD, RICE, OKRs…)", type: "text" },
+    { key: "pr_years", label: "Years in product", type: "number", required: true },
+  ],
+  sales: [
+    { key: "sl_segment", label: "Segment you've sold to (B2B SMB, Enterprise, D2C…)", type: "text", required: true },
+    { key: "sl_quota", label: "Last annual quota & attainment", type: "text", required: true },
+    { key: "sl_years", label: "Years in sales", type: "number", required: true },
+  ],
+  engineering: [
+    { key: "eng_github", label: "GitHub URL", type: "url", required: true },
+    { key: "eng_stack", label: "Primary stack", type: "text", required: true },
+    { key: "eng_years", label: "Years of engineering experience", type: "number", required: true },
+  ],
+  design: [
+    { key: "ds_portfolio", label: "Portfolio URL (Dribbble/Behance/site)", type: "url", required: true },
+    { key: "ds_tools", label: "Tools (Figma, Adobe CC…)", type: "text", required: true },
+    { key: "ds_years", label: "Years of design experience", type: "number", required: true },
+  ],
+};
+
+export function getDepartmentDefaults(name: string): CustomField[] {
+  return DEPARTMENT_DEFAULTS[name.trim().toLowerCase()] ?? [];
+}
+
 export const APPLICATION_STATUSES = [
   "pending",
   "reviewing",
