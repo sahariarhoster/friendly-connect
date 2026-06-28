@@ -198,6 +198,11 @@ function ApplyPage() {
 
   const fields = getActiveFields();
   const posType = job.position_type as PositionType;
+  const bf = (job.base_fields ?? {}) as BaseFieldsConfig;
+  const phoneCfg = getBaseField(bf, "phone");
+  const portfolioCfg = getBaseField(bf, "portfolio_url");
+  const resumeCfg = getBaseField(bf, "resume");
+  const coverCfg = getBaseField(bf, "cover_letter");
 
   return (
     <AppShell>
