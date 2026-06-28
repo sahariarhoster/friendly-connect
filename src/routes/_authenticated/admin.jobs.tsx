@@ -12,9 +12,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { POSITION_LABELS, OFFICES, CUSTOM_FIELDS, type PositionType, type CustomField, type CustomFieldType } from "@/lib/positions";
+import { POSITION_LABELS, CUSTOM_FIELDS, type PositionType, type CustomField } from "@/lib/positions";
 import { useDepartments } from "@/hooks/useDepartments";
-import { Plus, Pencil, Trash2, Link2, GripVertical } from "lucide-react";
+import { useOffices } from "@/hooks/useOffices";
+import { FieldList } from "@/components/FieldEditor";
+import { Plus, Pencil, Trash2, Link2 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/jobs")({
@@ -35,13 +37,14 @@ type JobRow = {
   deadline: string | null;
   custom_fields: CustomField[];
   use_position_defaults: boolean;
+  use_department_defaults: boolean;
 };
 
 function emptyJob(): Partial<JobRow> {
   return {
     title: "", department: "", position_type: "other", description: "", requirements: "",
     location: "", employment_type: "Full-time", salary_range: "", status: "draft", deadline: null,
-    custom_fields: [], use_position_defaults: true,
+    custom_fields: [], use_position_defaults: true, use_department_defaults: true,
   };
 }
 
@@ -75,6 +78,7 @@ function AdminJobs() {
         deadline: job.deadline || null,
         custom_fields: (job.custom_fields ?? []) as unknown as never,
         use_position_defaults: job.use_position_defaults ?? true,
+        use_department_defaults: job.use_department_defaults ?? true,
       };
       if (job.id) {
         const { error } = await supabase.from("jobs").update(payload).eq("id", job.id);
@@ -109,7 +113,12 @@ function AdminJobs() {
 
   function openNew() { setEditing(emptyJob()); setDialogOpen(true); }
   function openEdit(j: JobRow) {
-    setEditing({ ...j, custom_fields: j.custom_fields ?? [], use_position_defaults: j.use_position_defaults ?? true });
+    setEditing({
+      ...j,
+      custom_fields: j.custom_fields ?? [],
+      use_position_defaults: j.use_position_defaults ?? true,
+      use_department_defaults: j.use_department_defaults ?? true,
+    });
     setDialogOpen(true);
   }
 
@@ -206,11 +215,14 @@ function JobDialog({
   saving: boolean;
 }) {
   const { data: departments = [] } = useDepartments();
+  const { data: offices = [] } = useOffices();
   if (!editing) return null;
   const set = (k: keyof JobRow, v: unknown) => setEditing({ ...editing, [k]: v });
   const fields = editing.custom_fields ?? [];
   const setFields = (next: CustomField[]) => set("custom_fields", next);
-  const defaults = CUSTOM_FIELDS[(editing.position_type ?? "other") as PositionType] ?? [];
+  const positionDefaults = CUSTOM_FIELDS[(editing.position_type ?? "other") as PositionType] ?? [];
+  const selectedDept = departments.find((d) => d.name === editing.department);
+  const departmentDefaults = selectedDept?.custom_fields ?? [];
 
   return (
     <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
@@ -261,8 +273,8 @@ function JobDialog({
             <Select value={editing.location ?? ""} onValueChange={(v) => set("location", v)}>
               <SelectTrigger><SelectValue placeholder="Select office" /></SelectTrigger>
               <SelectContent>
-                {OFFICES.map((o) => (
-                  <SelectItem key={o} value={o}>{o}</SelectItem>
+                {offices.map((o) => (
+                  <SelectItem key={o.id} value={o.name}>{o.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -305,11 +317,24 @@ function JobDialog({
             </div>
           </div>
 
-          {defaults.length > 0 && (
+          {departmentDefaults.length > 0 && (
+            <div className="flex items-center justify-between rounded-md border border-border bg-background p-3">
+              <div>
+                <div className="text-sm font-medium">Include {selectedDept?.name} default questions</div>
+                <div className="text-xs text-muted-foreground">{departmentDefaults.map((d) => d.label).join(" · ")}</div>
+              </div>
+              <Switch
+                checked={editing.use_department_defaults ?? true}
+                onCheckedChange={(v) => set("use_department_defaults", v)}
+              />
+            </div>
+          )}
+
+          {positionDefaults.length > 0 && (
             <div className="flex items-center justify-between rounded-md border border-border bg-background p-3">
               <div>
                 <div className="text-sm font-medium">Include {POSITION_LABELS[editing.position_type as PositionType]} default questions</div>
-                <div className="text-xs text-muted-foreground">{defaults.map((d) => d.label).join(" · ")}</div>
+                <div className="text-xs text-muted-foreground">{positionDefaults.map((d) => d.label).join(" · ")}</div>
               </div>
               <Switch
                 checked={editing.use_position_defaults ?? true}
@@ -318,40 +343,10 @@ function JobDialog({
             </div>
           )}
 
-          <div className="space-y-3">
-            {fields.length === 0 && (
-              <p className="text-xs text-muted-foreground">No custom questions yet. Add one below.</p>
-            )}
-            {fields.map((f, i) => (
-              <FieldEditor
-                key={i}
-                field={f}
-                onChange={(next) => setFields(fields.map((x, idx) => (idx === i ? next : x)))}
-                onRemove={() => setFields(fields.filter((_, idx) => idx !== i))}
-                onMove={(dir) => {
-                  const j = i + dir;
-                  if (j < 0 || j >= fields.length) return;
-                  const next = [...fields];
-                  [next[i], next[j]] = [next[j], next[i]];
-                  setFields(next);
-                }}
-              />
-            ))}
+          <div>
+            <div className="mb-2 text-sm font-medium">Extra questions for this job</div>
+            <FieldList fields={fields} onChange={setFields} />
           </div>
-
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() =>
-              setFields([
-                ...fields,
-                { key: `q_${fields.length + 1}_${Math.random().toString(36).slice(2, 6)}`, label: "", type: "text", required: false },
-              ])
-            }
-          >
-            <Plus className="mr-1 h-4 w-4" /> Add question
-          </Button>
         </div>
       </div>
       <DialogFooter>
@@ -363,63 +358,3 @@ function JobDialog({
   );
 }
 
-function FieldEditor({
-  field, onChange, onRemove, onMove,
-}: {
-  field: CustomField;
-  onChange: (f: CustomField) => void;
-  onRemove: () => void;
-  onMove: (dir: -1 | 1) => void;
-}) {
-  return (
-    <div className="rounded-md border border-border bg-background p-3 space-y-3">
-      <div className="flex items-center gap-2">
-        <GripVertical className="h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Question label (e.g. Years of experience)"
-          value={field.label}
-          onChange={(e) => onChange({ ...field, label: e.target.value })}
-          className="flex-1"
-        />
-        <Button type="button" variant="ghost" size="icon" onClick={() => onMove(-1)} title="Move up">↑</Button>
-        <Button type="button" variant="ghost" size="icon" onClick={() => onMove(1)} title="Move down">↓</Button>
-        <Button type="button" variant="ghost" size="icon" onClick={onRemove} title="Remove">
-          <Trash2 className="h-4 w-4" />
-        </Button>
-      </div>
-      <div className="grid gap-3 md:grid-cols-3">
-        <div>
-          <Label className="text-xs">Type</Label>
-          <Select value={field.type} onValueChange={(v) => onChange({ ...field, type: v as CustomFieldType })}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="text">Short text</SelectItem>
-              <SelectItem value="textarea">Long text</SelectItem>
-              <SelectItem value="url">URL</SelectItem>
-              <SelectItem value="number">Number</SelectItem>
-              <SelectItem value="select">Dropdown</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <Label className="text-xs">Placeholder</Label>
-          <Input value={field.placeholder ?? ""} onChange={(e) => onChange({ ...field, placeholder: e.target.value })} />
-        </div>
-        <div className="flex items-end gap-2">
-          <Switch checked={!!field.required} onCheckedChange={(v) => onChange({ ...field, required: v })} />
-          <Label className="text-xs">Required</Label>
-        </div>
-      </div>
-      {field.type === "select" && (
-        <div>
-          <Label className="text-xs">Options (one per line)</Label>
-          <Textarea
-            rows={3}
-            value={(field.options ?? []).join("\n")}
-            onChange={(e) => onChange({ ...field, options: e.target.value.split("\n").map((s) => s.trim()).filter(Boolean) })}
-          />
-        </div>
-      )}
-    </div>
-  );
-}

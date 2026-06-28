@@ -27,6 +27,7 @@ function AdminLayout() {
     { to: "/admin/jobs", label: "Job posts" },
     { to: "/admin/applications", label: "Applications" },
     { to: "/admin/departments", label: "Departments" },
+    { to: "/admin/offices", label: "Offices" },
   ];
 
   return (
