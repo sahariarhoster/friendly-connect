@@ -56,39 +56,38 @@ function AdminOffices() {
   });
 
   return (
-    <main className="mx-auto max-w-4xl px-6 py-8">
+    <main className="mx-auto max-w-4xl px-6 py-8 space-y-6">
       <PageHeader
         icon={MapPin}
         eyebrow="Admin · Offices"
         title="Office locations"
-        description="Manage office locations admins can pick when posting jobs."
+        description="Manage the locations admins can pick when posting jobs."
       />
 
-      <Card className="mb-6 mt-6">
-
-        <CardContent className="flex gap-2 p-4">
+      <Card className="border-border/70">
+        <CardContent className="flex flex-col gap-2 p-4 sm:flex-row">
           <Input
             placeholder="New office name (e.g. Dhaka — Engineering)"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter" && newName.trim()) add.mutate(newName.trim()); }}
           />
-          <Button onClick={() => newName.trim() && add.mutate(newName.trim())} disabled={add.isPending || !newName.trim()}>
-            <Plus className="mr-1 h-4 w-4" /> Add
+          <Button onClick={() => newName.trim() && add.mutate(newName.trim())} disabled={add.isPending || !newName.trim()} className="gap-1">
+            <Plus className="h-4 w-4" /> Add office
           </Button>
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="overflow-hidden border-border/70">
         <CardContent className="p-0">
           {isLoading ? (
             <p className="p-6 text-muted-foreground">Loading…</p>
           ) : offices.length === 0 ? (
-            <p className="p-6 text-muted-foreground">No offices yet.</p>
+            <p className="p-6 text-center text-sm text-muted-foreground">No offices yet — add one above.</p>
           ) : (
             <Table>
               <TableHeader>
-                <TableRow>
+                <TableRow className="bg-muted/40 hover:bg-muted/40">
                   <TableHead>Name</TableHead>
                   <TableHead className="w-32">Active</TableHead>
                   <TableHead className="w-24 text-right">Actions</TableHead>
@@ -96,21 +95,26 @@ function AdminOffices() {
               </TableHeader>
               <TableBody>
                 {offices.map((o) => (
-                  <TableRow key={o.id}>
+                  <TableRow key={o.id} className="hover:bg-muted/30">
                     <TableCell>
-                      <Input
-                        defaultValue={o.name}
-                        onBlur={(e) => {
-                          const v = e.target.value.trim();
-                          if (v && v !== o.name) rename.mutate({ id: o.id, name: v });
-                        }}
-                      />
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-soft text-primary">
+                          <MapPin className="h-4 w-4" />
+                        </div>
+                        <Input
+                          defaultValue={o.name}
+                          onBlur={(e) => {
+                            const v = e.target.value.trim();
+                            if (v && v !== o.name) rename.mutate({ id: o.id, name: v });
+                          }}
+                        />
+                      </div>
                     </TableCell>
                     <TableCell>
                       <Switch checked={o.active} onCheckedChange={(v) => toggle.mutate({ id: o.id, active: v })} />
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="icon" onClick={() => { if (confirm(`Delete "${o.name}"?`)) del.mutate(o.id); }}>
+                      <Button variant="ghost" size="icon" onClick={() => { if (confirm(`Delete "${o.name}"?`)) del.mutate(o.id); }} className="text-muted-foreground hover:text-destructive">
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </TableCell>
@@ -124,3 +128,4 @@ function AdminOffices() {
     </main>
   );
 }
+
