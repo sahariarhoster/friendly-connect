@@ -233,35 +233,44 @@ function ApplyPage() {
                   <Label htmlFor="email">Email *</Label>
                   <Input id="email" name="email" type="email" defaultValue={user?.email ?? ""} required />
                 </div>
-                <div>
-                  <Label htmlFor="phone">Phone</Label>
-                  <Input id="phone" name="phone" maxLength={30} />
-                </div>
-                <div>
-                  <Label htmlFor="portfolio_url">Portfolio / LinkedIn URL</Label>
-                  <Input id="portfolio_url" name="portfolio_url" type="url" />
-                </div>
+                {phoneCfg.enabled && (
+                  <div>
+                    <Label htmlFor="phone">Phone {phoneCfg.required && "*"}</Label>
+                    <Input id="phone" name="phone" maxLength={30} required={phoneCfg.required} />
+                  </div>
+                )}
+                {portfolioCfg.enabled && (
+                  <div>
+                    <Label htmlFor="portfolio_url">Portfolio / LinkedIn URL {portfolioCfg.required && "*"}</Label>
+                    <Input id="portfolio_url" name="portfolio_url" type="url" required={portfolioCfg.required} />
+                  </div>
+                )}
               </div>
 
-              <div>
-                <Label htmlFor="resume">Resume (PDF/DOC)</Label>
-                <Input
-                  id="resume"
-                  type="file"
-                  accept=".pdf,.doc,.docx"
-                  onChange={(e) => {
-                    const f = e.target.files?.[0];
-                    if (f) handleResumeUpload(f);
-                  }}
-                />
-                {uploading && <p className="mt-1 text-xs text-muted-foreground">Uploading…</p>}
-                {resumeUrl && <p className="mt-1 text-xs text-primary">Resume uploaded ✓</p>}
-              </div>
+              {resumeCfg.enabled && (
+                <div>
+                  <Label htmlFor="resume">Resume (PDF/DOC) {resumeCfg.required && "*"}</Label>
+                  <Input
+                    id="resume"
+                    type="file"
+                    accept=".pdf,.doc,.docx"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) handleResumeUpload(f);
+                    }}
+                  />
+                  {uploading && <p className="mt-1 text-xs text-muted-foreground">Uploading…</p>}
+                  {resumeUrl && <p className="mt-1 text-xs text-primary">Resume uploaded ✓</p>}
+                </div>
+              )}
 
-              <div>
-                <Label htmlFor="cover_letter">Cover letter</Label>
-                <Textarea id="cover_letter" name="cover_letter" rows={5} maxLength={3000} placeholder="Why are you a good fit?" />
-              </div>
+              {coverCfg.enabled && (
+                <div>
+                  <Label htmlFor="cover_letter">Cover letter {coverCfg.required && "*"}</Label>
+                  <Textarea id="cover_letter" name="cover_letter" rows={5} maxLength={3000} placeholder="Why are you a good fit?" required={coverCfg.required} />
+                </div>
+              )}
+
 
               {fields.length > 0 && (
                 <div className="space-y-4 rounded-lg border border-border bg-muted/30 p-4">
