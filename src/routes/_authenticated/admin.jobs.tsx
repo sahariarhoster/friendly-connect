@@ -78,6 +78,7 @@ function AdminJobs() {
         deadline: job.deadline || null,
         custom_fields: (job.custom_fields ?? []) as unknown as never,
         use_position_defaults: job.use_position_defaults ?? true,
+        use_department_defaults: job.use_department_defaults ?? true,
       };
       if (job.id) {
         const { error } = await supabase.from("jobs").update(payload).eq("id", job.id);
@@ -112,7 +113,12 @@ function AdminJobs() {
 
   function openNew() { setEditing(emptyJob()); setDialogOpen(true); }
   function openEdit(j: JobRow) {
-    setEditing({ ...j, custom_fields: j.custom_fields ?? [], use_position_defaults: j.use_position_defaults ?? true });
+    setEditing({
+      ...j,
+      custom_fields: j.custom_fields ?? [],
+      use_position_defaults: j.use_position_defaults ?? true,
+      use_department_defaults: j.use_department_defaults ?? true,
+    });
     setDialogOpen(true);
   }
 
