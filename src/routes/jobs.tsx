@@ -28,10 +28,11 @@ function JobsPage() {
 
   const { data: jobs, isLoading } = useQuery({
     queryKey: ["public-jobs"],
+    staleTime: 60_000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("jobs")
-        .select("*")
+        .select("id, title, department, position_type, description, location, deadline, status, created_at")
         .eq("status", "open")
         .order("created_at", { ascending: false });
       if (error) throw error;
