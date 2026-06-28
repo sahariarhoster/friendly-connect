@@ -45,7 +45,7 @@ function ApplyPage() {
         timeout,
       ]);
       if (error) throw error;
-      return data as (Record<string, unknown> & { custom_fields?: CustomField[]; use_position_defaults?: boolean; use_department_defaults?: boolean; department?: string | null }) | null;
+      return data as (Record<string, unknown> & { custom_fields?: CustomField[]; use_position_defaults?: boolean; use_department_defaults?: boolean; department?: string | null; base_fields?: BaseFieldsConfig }) | null;
     },
     retry: false,
     staleTime: 60_000,
