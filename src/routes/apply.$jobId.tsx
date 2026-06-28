@@ -33,12 +33,21 @@ function ApplyPage() {
     });
   }, []);
 
-  const { data: job, isLoading } = useQuery({
+  const { data: job, isLoading, isError } = useQuery({
     queryKey: ["job-public", jobId],
     queryFn: async () => {
-      const { data } = await supabase.from("jobs").select("*").eq("id", jobId).maybeSingle();
+      const timeout = new Promise<never>((_, reject) => {
+        window.setTimeout(() => reject(new Error("Timed out loading this job")), 8000);
+      });
+      const { data, error } = await Promise.race([
+        supabase.from("jobs").select("*").eq("id", jobId).maybeSingle(),
+        timeout,
+      ]);
+      if (error) throw error;
       return data as (Record<string, unknown> & { custom_fields?: CustomField[]; use_position_defaults?: boolean; use_department_defaults?: boolean; department?: string | null }) | null;
     },
+    retry: false,
+    staleTime: 60_000,
   });
   const { data: departments = [] } = useDepartments();
 
@@ -131,7 +140,7 @@ function ApplyPage() {
     );
   }
 
-  if (!job) {
+  if (!job || isError) {
     return (
       <AppShell>
         <div className="mx-auto max-w-2xl px-6 py-20 text-center">
