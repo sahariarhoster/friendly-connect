@@ -102,6 +102,7 @@ export type Database = {
       }
       jobs: {
         Row: {
+          base_fields: Json
           created_at: string
           created_by: string | null
           custom_fields: Json
@@ -121,6 +122,7 @@ export type Database = {
           use_position_defaults: boolean
         }
         Insert: {
+          base_fields?: Json
           created_at?: string
           created_by?: string | null
           custom_fields?: Json
@@ -140,6 +142,7 @@ export type Database = {
           use_position_defaults?: boolean
         }
         Update: {
+          base_fields?: Json
           created_at?: string
           created_by?: string | null
           custom_fields?: Json

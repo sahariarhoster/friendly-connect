@@ -13,10 +13,11 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { POSITION_LABELS, CUSTOM_FIELDS, type PositionType, type CustomField } from "@/lib/positions";
+import { BASE_FIELD_LABELS, BASE_FIELD_DEFAULTS, getBaseField, type BaseFieldKey, type BaseFieldsConfig } from "@/lib/baseFields";
 import { useDepartments } from "@/hooks/useDepartments";
 import { useOffices } from "@/hooks/useOffices";
 import { QuestionsDialog } from "@/components/QuestionsDialog";
-import { Plus, Pencil, Trash2, Link2, Briefcase, ListChecks } from "lucide-react";
+import { Plus, Pencil, Trash2, Link2, Briefcase, ListChecks, FileText } from "lucide-react";
 import { PageHeader, EmptyState } from "@/components/PageHeader";
 import { toast } from "sonner";
 
@@ -39,6 +40,7 @@ type JobRow = {
   custom_fields: CustomField[];
   use_position_defaults: boolean;
   use_department_defaults: boolean;
+  base_fields: BaseFieldsConfig;
 };
 
 function emptyJob(): Partial<JobRow> {
@@ -46,6 +48,7 @@ function emptyJob(): Partial<JobRow> {
     title: "", department: "", position_type: "other", description: "", requirements: "",
     location: "", employment_type: "Full-time", salary_range: "", status: "draft", deadline: null,
     custom_fields: [], use_position_defaults: true, use_department_defaults: true,
+    base_fields: {},
   };
 }
 
@@ -80,6 +83,7 @@ function AdminJobs() {
         custom_fields: (job.custom_fields ?? []) as unknown as never,
         use_position_defaults: job.use_position_defaults ?? true,
         use_department_defaults: job.use_department_defaults ?? true,
+        base_fields: (job.base_fields ?? {}) as unknown as never,
       };
       if (job.id) {
         const { error } = await supabase.from("jobs").update(payload).eq("id", job.id);
@@ -119,6 +123,7 @@ function AdminJobs() {
       custom_fields: j.custom_fields ?? [],
       use_position_defaults: j.use_position_defaults ?? true,
       use_department_defaults: j.use_department_defaults ?? true,
+      base_fields: (j.base_fields ?? {}) as BaseFieldsConfig,
     });
     setDialogOpen(true);
   }
@@ -241,6 +246,11 @@ function JobDialog({
   const positionDefaults = CUSTOM_FIELDS[(editing.position_type ?? "other") as PositionType] ?? [];
   const selectedDept = departments.find((d) => d.name === editing.department);
   const departmentDefaults = selectedDept?.custom_fields ?? [];
+  const baseFields = (editing.base_fields ?? {}) as BaseFieldsConfig;
+  const updateBaseField = (key: BaseFieldKey, patch: Partial<{ enabled: boolean; required: boolean }>) => {
+    const current = { ...BASE_FIELD_DEFAULTS[key], ...(baseFields[key] ?? {}) };
+    set("base_fields", { ...baseFields, [key]: { ...current, ...patch } });
+  };
 
   return (
     <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
@@ -324,6 +334,53 @@ function JobDialog({
         <div>
           <Label>Requirements</Label>
           <Textarea rows={4} value={editing.requirements ?? ""} onChange={(e) => set("requirements", e.target.value)} />
+        </div>
+
+        {/* Base fields toggles */}
+        <div className="rounded-xl border border-border bg-card p-5 space-y-3">
+          <div className="flex items-start gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-soft text-primary">
+              <FileText className="h-5 w-5" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-foreground">Built-in fields</h3>
+              <p className="text-xs text-muted-foreground">
+                Full name and Email are always shown. Toggle the rest per job.
+              </p>
+            </div>
+          </div>
+          <div className="divide-y divide-border rounded-lg border border-border">
+            {(Object.keys(BASE_FIELD_LABELS) as BaseFieldKey[]).map((key) => {
+              const cfg = getBaseField(baseFields, key);
+              return (
+                <div key={key} className="flex items-center justify-between gap-3 p-3">
+                  <div className="min-w-0">
+                    <div className="text-sm font-medium">{BASE_FIELD_LABELS[key]}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {cfg.enabled ? (cfg.required ? "Shown · Required" : "Shown · Optional") : "Hidden"}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                      Required
+                      <Switch
+                        checked={cfg.required}
+                        disabled={!cfg.enabled}
+                        onCheckedChange={(v) => updateBaseField(key, { required: v })}
+                      />
+                    </label>
+                    <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                      Show
+                      <Switch
+                        checked={cfg.enabled}
+                        onCheckedChange={(v) => updateBaseField(key, { enabled: v, required: v ? cfg.required : false })}
+                      />
+                    </label>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         {/* Form builder */}

@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { CUSTOM_FIELDS, POSITION_LABELS, type PositionType, type CustomField } from "@/lib/positions";
+import { getBaseField, type BaseFieldsConfig } from "@/lib/baseFields";
 import { useDepartments } from "@/hooks/useDepartments";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
 
@@ -44,7 +45,7 @@ function ApplyPage() {
         timeout,
       ]);
       if (error) throw error;
-      return data as (Record<string, unknown> & { custom_fields?: CustomField[]; use_position_defaults?: boolean; use_department_defaults?: boolean; department?: string | null }) | null;
+      return data as (Record<string, unknown> & { custom_fields?: CustomField[]; use_position_defaults?: boolean; use_department_defaults?: boolean; department?: string | null; base_fields?: BaseFieldsConfig }) | null;
     },
     retry: false,
     staleTime: 60_000,
@@ -110,6 +111,25 @@ function ApplyPage() {
     if (!job) return;
     const fd = new FormData(e.currentTarget);
     const fields = getActiveFields();
+    const bf = (job.base_fields ?? {}) as BaseFieldsConfig;
+    const phoneCfg = getBaseField(bf, "phone");
+    const portfolioCfg = getBaseField(bf, "portfolio_url");
+    const resumeCfg = getBaseField(bf, "resume");
+    const coverCfg = getBaseField(bf, "cover_letter");
+
+    if (phoneCfg.enabled && phoneCfg.required && !String(fd.get("phone") ?? "").trim()) {
+      toast.error("Phone is required"); return;
+    }
+    if (portfolioCfg.enabled && portfolioCfg.required && !String(fd.get("portfolio_url") ?? "").trim()) {
+      toast.error("Portfolio / LinkedIn URL is required"); return;
+    }
+    if (resumeCfg.enabled && resumeCfg.required && !resumeUrl) {
+      toast.error("Resume is required"); return;
+    }
+    if (coverCfg.enabled && coverCfg.required && !String(fd.get("cover_letter") ?? "").trim()) {
+      toast.error("Cover letter is required"); return;
+    }
+
     const custom_responses: Record<string, string> = {};
     for (const f of fields) {
       const v = f.type === "file" ? (fileResponses[f.key] ?? "") : String(fd.get(`cf_${f.key}`) ?? "");
@@ -124,10 +144,10 @@ function ApplyPage() {
       applicant_id: user?.id ?? null,
       full_name: String(fd.get("full_name") ?? ""),
       email: String(fd.get("email") ?? user?.email ?? ""),
-      phone: String(fd.get("phone") ?? "") || null,
-      cover_letter: String(fd.get("cover_letter") ?? "") || null,
-      portfolio_url: String(fd.get("portfolio_url") ?? "") || null,
-      resume_url: resumeUrl,
+      phone: phoneCfg.enabled ? (String(fd.get("phone") ?? "") || null) : null,
+      cover_letter: coverCfg.enabled ? (String(fd.get("cover_letter") ?? "") || null) : null,
+      portfolio_url: portfolioCfg.enabled ? (String(fd.get("portfolio_url") ?? "") || null) : null,
+      resume_url: resumeCfg.enabled ? resumeUrl : null,
       custom_responses,
     });
   }
@@ -178,6 +198,11 @@ function ApplyPage() {
 
   const fields = getActiveFields();
   const posType = job.position_type as PositionType;
+  const bf = (job.base_fields ?? {}) as BaseFieldsConfig;
+  const phoneCfg = getBaseField(bf, "phone");
+  const portfolioCfg = getBaseField(bf, "portfolio_url");
+  const resumeCfg = getBaseField(bf, "resume");
+  const coverCfg = getBaseField(bf, "cover_letter");
 
   return (
     <AppShell>
@@ -208,35 +233,44 @@ function ApplyPage() {
                   <Label htmlFor="email">Email *</Label>
                   <Input id="email" name="email" type="email" defaultValue={user?.email ?? ""} required />
                 </div>
-                <div>
-                  <Label htmlFor="phone">Phone</Label>
-                  <Input id="phone" name="phone" maxLength={30} />
-                </div>
-                <div>
-                  <Label htmlFor="portfolio_url">Portfolio / LinkedIn URL</Label>
-                  <Input id="portfolio_url" name="portfolio_url" type="url" />
-                </div>
+                {phoneCfg.enabled && (
+                  <div>
+                    <Label htmlFor="phone">Phone {phoneCfg.required && "*"}</Label>
+                    <Input id="phone" name="phone" maxLength={30} required={phoneCfg.required} />
+                  </div>
+                )}
+                {portfolioCfg.enabled && (
+                  <div>
+                    <Label htmlFor="portfolio_url">Portfolio / LinkedIn URL {portfolioCfg.required && "*"}</Label>
+                    <Input id="portfolio_url" name="portfolio_url" type="url" required={portfolioCfg.required} />
+                  </div>
+                )}
               </div>
 
-              <div>
-                <Label htmlFor="resume">Resume (PDF/DOC)</Label>
-                <Input
-                  id="resume"
-                  type="file"
-                  accept=".pdf,.doc,.docx"
-                  onChange={(e) => {
-                    const f = e.target.files?.[0];
-                    if (f) handleResumeUpload(f);
-                  }}
-                />
-                {uploading && <p className="mt-1 text-xs text-muted-foreground">Uploading…</p>}
-                {resumeUrl && <p className="mt-1 text-xs text-primary">Resume uploaded ✓</p>}
-              </div>
+              {resumeCfg.enabled && (
+                <div>
+                  <Label htmlFor="resume">Resume (PDF/DOC) {resumeCfg.required && "*"}</Label>
+                  <Input
+                    id="resume"
+                    type="file"
+                    accept=".pdf,.doc,.docx"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) handleResumeUpload(f);
+                    }}
+                  />
+                  {uploading && <p className="mt-1 text-xs text-muted-foreground">Uploading…</p>}
+                  {resumeUrl && <p className="mt-1 text-xs text-primary">Resume uploaded ✓</p>}
+                </div>
+              )}
 
-              <div>
-                <Label htmlFor="cover_letter">Cover letter</Label>
-                <Textarea id="cover_letter" name="cover_letter" rows={5} maxLength={3000} placeholder="Why are you a good fit?" />
-              </div>
+              {coverCfg.enabled && (
+                <div>
+                  <Label htmlFor="cover_letter">Cover letter {coverCfg.required && "*"}</Label>
+                  <Textarea id="cover_letter" name="cover_letter" rows={5} maxLength={3000} placeholder="Why are you a good fit?" required={coverCfg.required} />
+                </div>
+              )}
+
 
               {fields.length > 0 && (
                 <div className="space-y-4 rounded-lg border border-border bg-muted/30 p-4">
