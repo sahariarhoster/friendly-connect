@@ -74,7 +74,7 @@ function ApplyPage() {
     setUploading(true);
     const folder = await resolveFolder();
     const path = `${folder}/${jobId}-${Date.now()}-${file.name}`;
-    const { error } = await supabase.storage.from("resumes").upload(path, file, { upsert: true });
+    const { error } = await supabase.storage.from("resumes").upload(path, file, { upsert: false });
     setUploading(false);
     if (error) return toast.error(error.message);
     setResumeUrl(path);
@@ -85,7 +85,7 @@ function ApplyPage() {
     setUploading(true);
     const folder = await resolveFolder();
     const path = `${folder}/${jobId}-${key}-${Date.now()}-${file.name}`;
-    const { error } = await supabase.storage.from("resumes").upload(path, file, { upsert: true });
+    const { error } = await supabase.storage.from("resumes").upload(path, file, { upsert: false });
     setUploading(false);
     if (error) return toast.error(error.message);
     setFileResponses((p) => ({ ...p, [key]: path }));
