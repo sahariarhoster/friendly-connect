@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { CUSTOM_FIELDS, POSITION_LABELS, type PositionType, type CustomField } from "@/lib/positions";
+import { getBaseField, type BaseFieldsConfig } from "@/lib/baseFields";
 import { useDepartments } from "@/hooks/useDepartments";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
 
