@@ -11,7 +11,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { POSITION_LABELS, type PositionType } from "@/lib/positions";
+import { POSITION_LABELS, DEPARTMENTS, type PositionType } from "@/lib/positions";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
