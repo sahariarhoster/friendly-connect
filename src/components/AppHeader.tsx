@@ -60,6 +60,9 @@ export function AppHeader() {
                   <Button variant="ghost" size="sm">Admin</Button>
                 </Link>
               )}
+              <Link to="/profile">
+                <Button variant="ghost" size="sm">Profile</Button>
+              </Link>
               <Badge variant="secondary" className="hidden md:inline-flex">
                 {isAdmin ? "Admin" : "Applicant"}
               </Badge>
