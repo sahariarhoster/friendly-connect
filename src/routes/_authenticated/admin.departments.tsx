@@ -6,13 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { useDepartments, type Department } from "@/hooks/useDepartments";
-import { FieldList } from "@/components/FieldEditor";
+import { QuestionsDialog } from "@/components/QuestionsDialog";
 import type { CustomField } from "@/lib/positions";
-import { Plus, Trash2, Building2 } from "lucide-react";
-import { PageHeader } from "@/components/PageHeader";
+import { Plus, Trash2, Building2, ListChecks } from "lucide-react";
+import { PageHeader, EmptyState } from "@/components/PageHeader";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/departments")({
@@ -55,25 +54,24 @@ function AdminDepartments() {
   });
 
   return (
-    <main className="mx-auto max-w-4xl px-6 py-8">
+    <main className="mx-auto max-w-5xl px-6 py-8 space-y-6">
       <PageHeader
         icon={Building2}
         eyebrow="Admin · Departments"
         title="Departments & form templates"
-        description="Manage departments and the default application form questions for each."
+        description="Each department has its own default application questions. Jobs in that department inherit them automatically."
       />
 
-      <Card className="mb-6 mt-6">
-
-        <CardContent className="flex gap-2 p-4">
+      <Card className="border-border/70">
+        <CardContent className="flex flex-col gap-2 p-4 sm:flex-row">
           <Input
             placeholder="New department name…"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter" && newName.trim()) add.mutate(newName.trim()); }}
           />
-          <Button onClick={() => newName.trim() && add.mutate(newName.trim())} disabled={add.isPending || !newName.trim()}>
-            <Plus className="mr-1 h-4 w-4" /> Add
+          <Button onClick={() => newName.trim() && add.mutate(newName.trim())} disabled={add.isPending || !newName.trim()} className="gap-1">
+            <Plus className="h-4 w-4" /> Add department
           </Button>
         </CardContent>
       </Card>
@@ -81,24 +79,24 @@ function AdminDepartments() {
       {isLoading ? (
         <p className="text-muted-foreground">Loading…</p>
       ) : departments.length === 0 ? (
-        <Card><CardContent className="p-6 text-muted-foreground">No departments yet.</CardContent></Card>
+        <Card><EmptyState icon={Building2} title="No departments yet" description="Add your first department above." /></Card>
       ) : (
-        <Accordion type="multiple" className="space-y-3">
+        <div className="grid gap-4 md:grid-cols-2">
           {departments.map((d) => (
-            <DepartmentRow
+            <DepartmentCard
               key={d.id}
               dept={d}
               onSave={(patch) => update.mutate({ id: d.id, patch })}
               onDelete={() => { if (confirm(`Delete "${d.name}"?`)) del.mutate(d.id); }}
             />
           ))}
-        </Accordion>
+        </div>
       )}
     </main>
   );
 }
 
-function DepartmentRow({
+function DepartmentCard({
   dept, onSave, onDelete,
 }: {
   dept: Department;
@@ -106,60 +104,66 @@ function DepartmentRow({
   onDelete: () => void;
 }) {
   const [name, setName] = useState(dept.name);
-  const [fields, setFields] = useState<CustomField[]>(dept.custom_fields ?? []);
+  const fields: CustomField[] = dept.custom_fields ?? [];
 
   return (
-    <Card>
-      <AccordionItem value={dept.id} className="border-0">
-        <div className="flex items-center gap-3 px-4 py-2">
-          <AccordionTrigger className="flex-1 py-2 hover:no-underline">
-            <div className="flex flex-1 items-center gap-3 text-left">
-              <span className="font-medium">{dept.name}</span>
-              <Badge variant="secondary">{(dept.custom_fields ?? []).length} questions</Badge>
-              {!dept.active && <Badge variant="outline">Inactive</Badge>}
+    <Card className="overflow-hidden border-border/70 transition-shadow hover:shadow-md">
+      <CardContent className="space-y-4 p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-start gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary-soft text-primary">
+              <Building2 className="h-5 w-5" />
             </div>
-          </AccordionTrigger>
-          <Switch
-            checked={dept.active}
-            onCheckedChange={(v) => onSave({ active: v })}
-            onClick={(e) => e.stopPropagation()}
-          />
-          <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onDelete(); }}>
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
-        <AccordionContent>
-          <CardContent className="space-y-4 pt-0">
-            <div className="flex gap-2">
-              <Input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Department name"
-              />
-              <Button
-                variant="outline"
-                onClick={() => name.trim() && name !== dept.name && onSave({ name: name.trim() })}
-                disabled={!name.trim() || name === dept.name}
-              >
-                Rename
-              </Button>
-            </div>
-
-            <div className="rounded-lg border border-border bg-muted/30 p-4">
-              <h3 className="mb-1 text-sm font-semibold">Default form questions</h3>
-              <p className="mb-3 text-xs text-muted-foreground">
-                Jobs in this department will include these questions by default.
-              </p>
-              <FieldList fields={fields} onChange={setFields} />
-              <div className="mt-3 flex justify-end">
-                <Button size="sm" onClick={() => onSave({ custom_fields: fields })}>
-                  Save form
-                </Button>
+            <div>
+              <div className="font-semibold text-foreground">{dept.name}</div>
+              <div className="mt-1 flex flex-wrap gap-1.5">
+                <Badge variant="secondary" className="gap-1">
+                  <ListChecks className="h-3 w-3" /> {fields.length} questions
+                </Badge>
+                {!dept.active && <Badge variant="outline">Inactive</Badge>}
               </div>
             </div>
-          </CardContent>
-        </AccordionContent>
-      </AccordionItem>
+          </div>
+          <div className="flex items-center gap-1">
+            <Switch checked={dept.active} onCheckedChange={(v) => onSave({ active: v })} />
+            <Button variant="ghost" size="icon" onClick={onDelete} className="text-muted-foreground hover:text-destructive">
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+
+        <div className="flex gap-2">
+          <Input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Department name"
+          />
+          <Button
+            variant="outline"
+            onClick={() => name.trim() && name !== dept.name && onSave({ name: name.trim() })}
+            disabled={!name.trim() || name === dept.name}
+          >
+            Rename
+          </Button>
+        </div>
+
+        <div className="flex items-center justify-between rounded-lg border border-dashed border-border bg-muted/30 p-3">
+          <div className="min-w-0">
+            <div className="text-sm font-medium">Default questions</div>
+            <div className="truncate text-xs text-muted-foreground">
+              {fields.length === 0 ? "No questions set" : fields.map((f) => f.label || "Untitled").join(" · ")}
+            </div>
+          </div>
+          <QuestionsDialog
+            fields={fields}
+            onSave={(next) => onSave({ custom_fields: next })}
+            title={`${dept.name} default questions`}
+            description="These questions are added to every job in this department."
+            triggerLabel="Manage"
+          />
+        </div>
+      </CardContent>
     </Card>
   );
 }
+

@@ -79,7 +79,7 @@ function AdminApplications() {
   });
 
   return (
-    <main className="mx-auto max-w-7xl px-6 py-8">
+    <main className="mx-auto max-w-7xl px-6 py-8 space-y-6">
       <PageHeader
         icon={Inbox}
         eyebrow="Admin · Applications"
@@ -87,34 +87,35 @@ function AdminApplications() {
         description="Move candidates through the pipeline: pending → shortlisted → interviewed → hired."
       />
 
-      <div className="mb-4 mt-6 flex flex-wrap gap-3">
-        <Select value={jobFilter} onValueChange={setJobFilter}>
-          <SelectTrigger className="w-64"><SelectValue placeholder="All jobs" /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All jobs</SelectItem>
-            {(jobs ?? []).map((j) => <SelectItem key={j.id} value={j.id}>{j.title}</SelectItem>)}
-          </SelectContent>
-        </Select>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-48"><SelectValue placeholder="All statuses" /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All statuses</SelectItem>
-            {APPLICATION_STATUSES.map((s) => <SelectItem key={s} value={s}>{STATUS_LABELS[s]}</SelectItem>)}
-          </SelectContent>
-        </Select>
-      </div>
+      <Card className="border-border/70">
+        <CardContent className="flex flex-wrap gap-3 p-4">
+          <Select value={jobFilter} onValueChange={setJobFilter}>
+            <SelectTrigger className="w-64"><SelectValue placeholder="All jobs" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All jobs</SelectItem>
+              {(jobs ?? []).map((j) => <SelectItem key={j.id} value={j.id}>{j.title}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-48"><SelectValue placeholder="All statuses" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All statuses</SelectItem>
+              {APPLICATION_STATUSES.map((s) => <SelectItem key={s} value={s}>{STATUS_LABELS[s]}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </CardContent>
+      </Card>
 
-      <Card>
+      <Card className="overflow-hidden border-border/70">
         <CardContent className="p-0">
           {isLoading ? (
             <p className="p-6 text-muted-foreground">Loading…</p>
           ) : filtered.length === 0 ? (
             <EmptyState icon={Inbox} title="No applications match" description="Try clearing the filters above." />
           ) : (
-
             <Table>
               <TableHeader>
-                <TableRow>
+                <TableRow className="bg-muted/40 hover:bg-muted/40">
                   <TableHead>Applicant</TableHead>
                   <TableHead>Job</TableHead>
                   <TableHead>Submitted</TableHead>
@@ -124,13 +125,20 @@ function AdminApplications() {
               </TableHeader>
               <TableBody>
                 {filtered.map((a) => (
-                  <TableRow key={a.id}>
+                  <TableRow key={a.id} className="hover:bg-muted/30">
                     <TableCell>
-                      <div className="font-medium">{a.full_name}</div>
-                      <div className="text-xs text-muted-foreground">{a.email}</div>
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground font-semibold">
+                          {a.full_name.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="font-medium">{a.full_name}</div>
+                          <div className="text-xs text-muted-foreground">{a.email}</div>
+                        </div>
+                      </div>
                     </TableCell>
-                    <TableCell>{a.jobs?.title ?? "—"}</TableCell>
-                    <TableCell>{new Date(a.created_at).toLocaleDateString()}</TableCell>
+                    <TableCell className="text-sm">{a.jobs?.title ?? "—"}</TableCell>
+                    <TableCell className="text-sm text-muted-foreground">{new Date(a.created_at).toLocaleDateString()}</TableCell>
                     <TableCell>
                       <Select value={a.status} onValueChange={(v) => updateStatus.mutate({ id: a.id, status: v })}>
                         <SelectTrigger className="h-8 w-36"><SelectValue /></SelectTrigger>
@@ -152,6 +160,7 @@ function AdminApplications() {
     </main>
   );
 }
+
 
 function ApplicantSheet({ app }: { app: AppRow }) {
   const qc = useQueryClient();
