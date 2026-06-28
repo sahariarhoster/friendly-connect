@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { useDepartments, type Department } from "@/hooks/useDepartments";
 import { QuestionsDialog } from "@/components/QuestionsDialog";
 import { type CustomField, getDepartmentDefaults } from "@/lib/positions";
-import { Plus, Trash2, Building2, ListChecks, Sparkles } from "lucide-react";
+import { Plus, Trash2, Building2, ListChecks } from "lucide-react";
 import { PageHeader, EmptyState } from "@/components/PageHeader";
 import { toast } from "sonner";
 
@@ -104,9 +104,9 @@ function DepartmentCard({
   onDelete: () => void;
 }) {
   const [name, setName] = useState(dept.name);
-  const fields: CustomField[] = dept.custom_fields ?? [];
+  const stored: CustomField[] = dept.custom_fields ?? [];
   const suggested = getDepartmentDefaults(dept.name);
-  const showSuggested = fields.length === 0 && suggested.length > 0;
+  const fields: CustomField[] = stored.length === 0 && suggested.length > 0 ? suggested : stored;
 
   return (
     <Card className="overflow-hidden border-border/70 transition-shadow hover:shadow-md">
@@ -154,9 +154,7 @@ function DepartmentCard({
             <div className="min-w-0">
               <div className="text-sm font-medium">Default questions</div>
               <div className="text-xs text-muted-foreground">
-                {fields.length === 0
-                  ? showSuggested ? "Suggested template below — not yet saved" : "No questions set"
-                  : `${fields.length} active`}
+                {fields.length === 0 ? "No questions set" : `${fields.length} active`}
               </div>
             </div>
             <QuestionsDialog
@@ -178,31 +176,6 @@ function DepartmentCard({
                 </li>
               ))}
             </ul>
-          )}
-
-          {showSuggested && (
-            <div className="space-y-2 rounded-md border border-primary/30 bg-primary-soft/40 p-2">
-              <div className="flex items-center gap-1.5 text-xs font-medium text-primary">
-                <Sparkles className="h-3 w-3" /> Suggested for {dept.name}
-              </div>
-              <ul className="space-y-1 text-xs text-foreground/80">
-                {suggested.map((f, i) => (
-                  <li key={i} className="flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-primary/60" />
-                    <span className="truncate">{f.label}</span>
-                    {f.required && <span className="text-[10px] text-primary">*</span>}
-                  </li>
-                ))}
-              </ul>
-              <Button
-                size="sm"
-                variant="outline"
-                className="w-full gap-1"
-                onClick={() => onSave({ custom_fields: suggested })}
-              >
-                <Sparkles className="h-3 w-3" /> Use these defaults
-              </Button>
-            </div>
           )}
         </div>
       </CardContent>
