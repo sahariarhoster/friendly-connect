@@ -37,44 +37,48 @@ export function AppHeader() {
   }
 
   return (
-    <header className="border-b border-border bg-card">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+    <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-3">
         <Link to="/" className="flex items-center gap-3">
-          <img src={logo.url} alt="Khatiana" className="h-9 w-auto" />
+          <div className="rounded-xl bg-gradient-to-br from-primary/15 to-primary/5 p-1.5 ring-1 ring-primary/20">
+            <img src={logo.url} alt="Khatiana" className="h-8 w-auto" />
+          </div>
+          <div className="hidden flex-col leading-tight sm:flex">
+            <span className="text-sm font-semibold">Khatiana</span>
+            <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Recruitment Suite</span>
+          </div>
         </Link>
-        <nav className="flex items-center gap-2">
-          <Link to="/jobs">
-            <Button variant="ghost" size="sm">Jobs</Button>
+        <nav className="flex items-center gap-1">
+          <Link to="/jobs" activeProps={{ className: "bg-primary/10 text-primary" }} className="rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+            Browse jobs
           </Link>
           {userId ? (
             <>
-              <Link to="/dashboard">
-                <Button variant="ghost" size="sm">Dashboard</Button>
+              <Link to="/dashboard" activeProps={{ className: "bg-primary/10 text-primary" }} className="rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+                Dashboard
               </Link>
               {!isAdmin && (
-                <Link to="/applications">
-                  <Button variant="ghost" size="sm">My applications</Button>
+                <Link to="/applications" activeProps={{ className: "bg-primary/10 text-primary" }} className="rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+                  My applications
                 </Link>
               )}
               {isAdmin && (
-                <Link to="/admin/jobs">
-                  <Button variant="ghost" size="sm">Admin</Button>
+                <Link to="/admin/jobs" activeProps={{ className: "bg-primary/10 text-primary" }} className="rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+                  Admin
                 </Link>
               )}
-              <Link to="/profile">
-                <Button variant="ghost" size="sm">Profile</Button>
-              </Link>
+              <div className="mx-2 hidden h-6 w-px bg-border md:block" />
               <Badge variant="secondary" className="hidden md:inline-flex">
                 {isAdmin ? "Admin" : "Applicant"}
               </Badge>
-              <span className="hidden text-xs text-muted-foreground md:inline">{email}</span>
-              <Button variant="outline" size="icon" onClick={signOut} aria-label="Sign out">
+              <span className="hidden max-w-[160px] truncate text-xs text-muted-foreground md:inline">{email}</span>
+              <Button variant="ghost" size="icon" onClick={signOut} aria-label="Sign out" className="ml-1">
                 <LogOut className="h-4 w-4" />
               </Button>
             </>
           ) : (
-            <Link to="/auth">
-              <Button size="sm">Sign in</Button>
+            <Link to="/auth" className="ml-1">
+              <Button size="sm" className="shadow-sm">Sign in</Button>
             </Link>
           )}
         </nav>
