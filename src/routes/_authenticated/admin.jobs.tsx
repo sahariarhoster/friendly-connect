@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { POSITION_LABELS, DEPARTMENTS, type PositionType } from "@/lib/positions";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Link2 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/jobs")({
@@ -152,6 +152,22 @@ function AdminJobs() {
                     </TableCell>
                     <TableCell>{j.deadline ? new Date(j.deadline).toLocaleDateString() : "—"}</TableCell>
                     <TableCell className="text-right">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        title="Copy apply link"
+                        onClick={async () => {
+                          const url = `${window.location.origin}/jobs/${j.id}`;
+                          try {
+                            await navigator.clipboard.writeText(url);
+                            toast.success("Apply link copied", { description: url });
+                          } catch {
+                            toast.error("Could not copy link");
+                          }
+                        }}
+                      >
+                        <Link2 className="h-4 w-4" />
+                      </Button>
                       <Button variant="ghost" size="icon" onClick={() => openEdit(j)}><Pencil className="h-4 w-4" /></Button>
                       <Button variant="ghost" size="icon" onClick={() => { if (confirm("Delete this job?")) del.mutate(j.id); }}>
                         <Trash2 className="h-4 w-4" />
