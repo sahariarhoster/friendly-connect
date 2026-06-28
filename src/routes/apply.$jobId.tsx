@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { CUSTOM_FIELDS, POSITION_LABELS, type PositionType, type CustomField } from "@/lib/positions";
+import { useDepartments } from "@/hooks/useDepartments";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
 
 export const Route = createFileRoute("/apply/$jobId")({
@@ -35,9 +36,10 @@ function ApplyPage() {
     queryKey: ["job-public", jobId],
     queryFn: async () => {
       const { data } = await supabase.from("jobs").select("*").eq("id", jobId).maybeSingle();
-      return data as (Record<string, unknown> & { custom_fields?: CustomField[]; use_position_defaults?: boolean }) | null;
+      return data as (Record<string, unknown> & { custom_fields?: CustomField[]; use_position_defaults?: boolean; use_department_defaults?: boolean; department?: string | null }) | null;
     },
   });
+  const { data: departments = [] } = useDepartments();
 
   const submit = useMutation({
     mutationFn: async (payload: Record<string, unknown>) => {
@@ -66,9 +68,20 @@ function ApplyPage() {
     if (!job) return [];
     const posType = job.position_type as PositionType;
     const custom = (job.custom_fields ?? []) as CustomField[];
-    const useDefaults = job.use_position_defaults ?? true;
-    const defaults = useDefaults ? CUSTOM_FIELDS[posType] ?? [] : [];
-    return [...defaults, ...custom];
+    const usePositionDefaults = job.use_position_defaults ?? true;
+    const useDepartmentDefaults = job.use_department_defaults ?? true;
+    const positionDefaults = usePositionDefaults ? CUSTOM_FIELDS[posType] ?? [] : [];
+    const dept = departments.find((d) => d.name === job.department);
+    const departmentDefaults = useDepartmentDefaults ? (dept?.custom_fields ?? []) : [];
+    // Dedup by key, order: department → position → custom
+    const merged: CustomField[] = [];
+    const seen = new Set<string>();
+    for (const f of [...departmentDefaults, ...positionDefaults, ...custom]) {
+      if (seen.has(f.key)) continue;
+      seen.add(f.key);
+      merged.push(f);
+    }
+    return merged;
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
