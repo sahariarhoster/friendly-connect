@@ -26,6 +26,7 @@ export const Route = createFileRoute("/jobs")({
 function JobsPage() {
   const [search, setSearch] = useState("");
   const [posType, setPosType] = useState<string>("all");
+  const [dept, setDept] = useState<string>("all");
 
   const { data: jobs, isLoading } = useQuery({
     queryKey: ["public-jobs"],
