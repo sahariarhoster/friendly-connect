@@ -16,7 +16,8 @@ import { POSITION_LABELS, CUSTOM_FIELDS, type PositionType, type CustomField } f
 import { useDepartments } from "@/hooks/useDepartments";
 import { useOffices } from "@/hooks/useOffices";
 import { FieldList } from "@/components/FieldEditor";
-import { Plus, Pencil, Trash2, Link2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Link2, Briefcase } from "lucide-react";
+import { PageHeader } from "@/components/PageHeader";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/jobs")({
