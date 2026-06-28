@@ -86,6 +86,7 @@ function FieldEditor({
               <SelectItem value="url">URL</SelectItem>
               <SelectItem value="number">Number</SelectItem>
               <SelectItem value="select">Dropdown</SelectItem>
+              <SelectItem value="file">File upload (CV/PDF/Doc)</SelectItem>
             </SelectContent>
           </Select>
         </div>

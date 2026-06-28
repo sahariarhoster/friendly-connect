@@ -17,7 +17,7 @@ export const POSITION_LABELS: Record<PositionType, string> = {
   other: "Other",
 };
 
-export type CustomFieldType = "text" | "textarea" | "url" | "number" | "select";
+export type CustomFieldType = "text" | "textarea" | "url" | "number" | "select" | "file";
 
 export type CustomField = {
   key: string;

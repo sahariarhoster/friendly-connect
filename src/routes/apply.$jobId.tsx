@@ -23,6 +23,7 @@ function ApplyPage() {
   const navigate = useNavigate();
   const [uploading, setUploading] = useState(false);
   const [resumeUrl, setResumeUrl] = useState<string | null>(null);
+  const [fileResponses, setFileResponses] = useState<Record<string, string>>({});
   const [user, setUser] = useState<{ id: string; email: string | null } | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
@@ -64,6 +65,17 @@ function ApplyPage() {
     toast.success("Resume uploaded");
   }
 
+  async function handleFieldFileUpload(key: string, file: File) {
+    setUploading(true);
+    const folder = user?.id ?? `guest/${crypto.randomUUID()}`;
+    const path = `${folder}/${jobId}-${key}-${Date.now()}-${file.name}`;
+    const { error } = await supabase.storage.from("resumes").upload(path, file, { upsert: true });
+    setUploading(false);
+    if (error) return toast.error(error.message);
+    setFileResponses((p) => ({ ...p, [key]: path }));
+    toast.success(`${file.name} uploaded`);
+  }
+
   function getActiveFields(): CustomField[] {
     if (!job) return [];
     const posType = job.position_type as PositionType;
@@ -91,7 +103,7 @@ function ApplyPage() {
     const fields = getActiveFields();
     const custom_responses: Record<string, string> = {};
     for (const f of fields) {
-      const v = String(fd.get(`cf_${f.key}`) ?? "");
+      const v = f.type === "file" ? (fileResponses[f.key] ?? "") : String(fd.get(`cf_${f.key}`) ?? "");
       if (f.required && !v.trim()) {
         toast.error(`${f.label} is required`);
         return;
@@ -223,6 +235,19 @@ function ApplyPage() {
                             ))}
                           </SelectContent>
                         </Select>
+                      ) : f.type === "file" ? (
+                        <>
+                          <Input
+                            id={`cf_${f.key}`}
+                            type="file"
+                            accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) handleFieldFileUpload(f.key, file);
+                            }}
+                          />
+                          {fileResponses[f.key] && <p className="mt-1 text-xs text-primary">Uploaded ✓</p>}
+                        </>
                       ) : (
                         <Input
                           id={`cf_${f.key}`}
