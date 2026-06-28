@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { AppHeader } from "@/components/AppHeader";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { STATUS_LABELS } from "@/lib/positions";
@@ -33,9 +33,7 @@ function MyApplications() {
   });
 
   return (
-    <div className="min-h-screen bg-background">
-      <AppHeader />
-      <main className="mx-auto max-w-5xl px-6 py-10">
+    <main className="mx-auto max-w-5xl px-6 py-10">
         <h1 className="text-3xl font-bold tracking-tight text-foreground">My applications</h1>
         <p className="mt-2 text-muted-foreground">Track the status of every role you've applied to.</p>
 
@@ -73,7 +71,6 @@ function MyApplications() {
             })
           )}
         </div>
-      </main>
-    </div>
+    </main>
   );
 }

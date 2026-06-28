@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, useNavigate, Link, useRouterState } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { AppHeader } from "@/components/AppHeader";
+
 import { useRoles } from "@/hooks/useRoles";
 import { Button } from "@/components/ui/button";
 
@@ -20,7 +20,7 @@ function AdminLayout() {
     }
   }, [isLoading, roles, navigate]);
 
-  if (isLoading) return <div className="min-h-screen bg-background"><AppHeader /></div>;
+  if (isLoading) return <div />;
   if (!roles?.includes("admin")) return null;
 
   const tabs = [
@@ -31,9 +31,9 @@ function AdminLayout() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <AppHeader />
+    <div>
       <div className="border-b border-border bg-card/50">
+
         <div className="mx-auto flex max-w-7xl gap-1 px-6">
           {tabs.map((t) => {
             const active = pathname.startsWith(t.to);
