@@ -11,13 +11,14 @@ import {
   LayoutDashboard,
   Briefcase,
   FileText,
-  Users,
-  UserCog,
   Building2,
   MapPin,
   User as UserIcon,
   LogOut,
   Menu,
+  Home,
+  LogIn,
+  Sparkles,
 } from "lucide-react";
 
 type NavItem = {
@@ -34,6 +35,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [userId, setUserId] = useState<string | undefined>();
   const [email, setEmail] = useState<string | undefined>();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [ready, setReady] = useState(false);
   const navigate = useNavigate();
   const qc = useQueryClient();
 
@@ -41,6 +43,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     supabase.auth.getSession().then(({ data }) => {
       setUserId(data.session?.user?.id);
       setEmail(data.session?.user?.email ?? undefined);
+      setReady(true);
     });
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
       setUserId(s?.user?.id);
@@ -51,6 +54,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   const { data: roles } = useRoles(userId);
   const isAdmin = roles?.includes("admin");
+  const signedIn = !!userId;
 
   const { data: profile } = useQuery({
     queryKey: ["profile", userId],
@@ -87,48 +91,62 @@ export function AppShell({ children }: { children: ReactNode }) {
     navigate({ to: "/auth", replace: true });
   }
 
-  const groups: NavGroup[] = isAdmin
+  const groups: NavGroup[] = !signedIn
     ? [
         {
-          label: "Main Menu",
+          label: "Explore",
           items: [
-            { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, exact: true },
+            { to: "/", label: "Home", icon: Home, exact: true },
             { to: "/jobs", label: "Browse Jobs", icon: Briefcase },
           ],
         },
         {
-          label: "Recruitment",
-          items: [
-            { to: "/admin/jobs", label: "Job Posts", icon: Briefcase },
-            { to: "/admin/applications", label: "Applications", icon: FileText, badgeKey: "pendingApps" },
-            { to: "/admin/departments", label: "Departments", icon: Building2 },
-            { to: "/admin/offices", label: "Offices", icon: MapPin },
-          ],
-        },
-        {
-          label: "Settings",
-          items: [{ to: "/profile", label: "Profile", icon: UserIcon }],
+          label: "Account",
+          items: [{ to: "/auth", label: "Sign in", icon: LogIn }],
         },
       ]
-    : [
-        {
-          label: "Main Menu",
-          items: [
-            { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, exact: true },
-            { to: "/jobs", label: "Find Jobs", icon: Briefcase },
-          ],
-        },
-        {
-          label: "Recruitment",
-          items: [
-            { to: "/applications", label: "My Applications", icon: FileText, badgeKey: "myApps" },
-          ],
-        },
-        {
-          label: "Settings",
-          items: [{ to: "/profile", label: "Profile", icon: UserIcon }],
-        },
-      ];
+    : isAdmin
+      ? [
+          {
+            label: "Main Menu",
+            items: [
+              { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, exact: true },
+              { to: "/jobs", label: "Browse Jobs", icon: Briefcase },
+            ],
+          },
+          {
+            label: "Recruitment",
+            items: [
+              { to: "/admin/jobs", label: "Job Posts", icon: Briefcase },
+              { to: "/admin/applications", label: "Applications", icon: FileText, badgeKey: "pendingApps" },
+              { to: "/admin/departments", label: "Departments", icon: Building2 },
+              { to: "/admin/offices", label: "Offices", icon: MapPin },
+            ],
+          },
+          {
+            label: "Settings",
+            items: [{ to: "/profile", label: "Profile", icon: UserIcon }],
+          },
+        ]
+      : [
+          {
+            label: "Main Menu",
+            items: [
+              { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, exact: true },
+              { to: "/jobs", label: "Find Jobs", icon: Briefcase },
+            ],
+          },
+          {
+            label: "Recruitment",
+            items: [
+              { to: "/applications", label: "My Applications", icon: FileText, badgeKey: "myApps" },
+            ],
+          },
+          {
+            label: "Settings",
+            items: [{ to: "/profile", label: "Profile", icon: UserIcon }],
+          },
+        ];
 
   const sidebar = (
     <SidebarInner
@@ -136,6 +154,8 @@ export function AppShell({ children }: { children: ReactNode }) {
       email={email}
       fullName={profile?.full_name ?? undefined}
       isAdmin={!!isAdmin}
+      signedIn={signedIn}
+      ready={ready}
       badges={badges}
       onNavigate={() => setMobileOpen(false)}
       onSignOut={signOut}
@@ -144,14 +164,11 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen w-full bg-muted/30 text-foreground">
-      {/* Desktop sidebar */}
       <aside className="hidden md:flex w-72 flex-col bg-card border-r border-border flex-shrink-0 sticky top-0 h-screen">
         {sidebar}
       </aside>
 
-      {/* Main area */}
       <main className="flex-1 flex flex-col min-w-0">
-        {/* Mobile top bar */}
         <div className="md:hidden flex items-center justify-between gap-3 border-b border-border bg-card px-4 h-14 sticky top-0 z-30">
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
@@ -182,6 +199,8 @@ function SidebarInner({
   email,
   fullName,
   isAdmin,
+  signedIn,
+  ready,
   badges,
   onNavigate,
   onSignOut,
@@ -190,6 +209,8 @@ function SidebarInner({
   email?: string;
   fullName?: string;
   isAdmin: boolean;
+  signedIn: boolean;
+  ready: boolean;
   badges?: { pendingApps: number; myApps: number };
   onNavigate: () => void;
   onSignOut: () => void;
@@ -199,9 +220,8 @@ function SidebarInner({
 
   return (
     <div className="flex flex-col h-full bg-card">
-      {/* Brand */}
       <div className="h-20 flex items-center px-6 gap-3 border-b border-border/60">
-        <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg shadow-primary/20">
           <Briefcase className="h-5 w-5 text-primary-foreground" />
         </div>
         <div className="min-w-0">
@@ -210,7 +230,6 @@ function SidebarInner({
         </div>
       </div>
 
-      {/* Navigation */}
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         {groups.map((group) => (
           <div key={group.label}>
@@ -262,29 +281,43 @@ function SidebarInner({
         ))}
       </nav>
 
-      {/* User mini-profile */}
       <div className="p-3 border-t border-border/60 mt-auto">
-        <div className="flex items-center gap-3 p-2 bg-muted/60 rounded-xl">
-          <div className="w-10 h-10 rounded-lg bg-primary text-primary-foreground flex items-center justify-center flex-shrink-0 font-bold">
-            {initial}
+        {signedIn ? (
+          <div className="flex items-center gap-3 p-2 bg-muted/60 rounded-xl">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-primary/70 text-primary-foreground flex items-center justify-center flex-shrink-0 font-bold">
+              {initial}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-foreground truncate">{fullName || "Account"}</p>
+              <p className="text-xs text-muted-foreground truncate">{email ?? ""}</p>
+              <p className="text-[10px] text-primary font-semibold uppercase tracking-wider mt-0.5">
+                {isAdmin ? "Admin" : "Applicant"}
+              </p>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onSignOut}
+              aria-label="Sign out"
+              className="text-muted-foreground hover:text-destructive shrink-0"
+            >
+              <LogOut className="h-4 w-4" />
+            </Button>
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-foreground truncate">{fullName || "Account"}</p>
-            <p className="text-xs text-muted-foreground truncate">{email ?? ""}</p>
-            <p className="text-[10px] text-primary font-semibold uppercase tracking-wider mt-0.5">
-              {isAdmin ? "Admin" : "Applicant"}
+        ) : ready ? (
+          <div className="rounded-xl border border-primary/20 bg-gradient-to-br from-primary-soft to-card p-4">
+            <div className="flex items-center gap-2 text-primary">
+              <Sparkles className="h-4 w-4" />
+              <p className="text-xs font-bold uppercase tracking-wider">Join Khatiana</p>
+            </div>
+            <p className="mt-1.5 text-xs text-muted-foreground">
+              Create a free account to track your applications.
             </p>
+            <Link to="/auth" onClick={onNavigate}>
+              <Button size="sm" className="mt-3 w-full">Sign in / Sign up</Button>
+            </Link>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onSignOut}
-            aria-label="Sign out"
-            className="text-muted-foreground hover:text-destructive shrink-0"
-          >
-            <LogOut className="h-4 w-4" />
-          </Button>
-        </div>
+        ) : null}
       </div>
     </div>
   );
