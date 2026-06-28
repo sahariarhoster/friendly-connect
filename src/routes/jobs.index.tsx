@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { POSITION_LABELS, DEPARTMENTS, type PositionType } from "@/lib/positions";
 import { Briefcase, MapPin, Clock } from "lucide-react";
 
-export const Route = createFileRoute("/jobs")({
+export const Route = createFileRoute("/jobs/")({
   head: () => ({
     meta: [
       { title: "Open roles — Khatiana Job Portal" },
