@@ -79,6 +79,17 @@ function JobsPage() {
               ))}
             </SelectContent>
           </Select>
+          <Select value={dept} onValueChange={setDept}>
+            <SelectTrigger className="sm:w-56">
+              <SelectValue placeholder="All departments" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All departments</SelectItem>
+              {DEPARTMENTS.map((d) => (
+                <SelectItem key={d} value={d}>{d}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {isLoading ? (
