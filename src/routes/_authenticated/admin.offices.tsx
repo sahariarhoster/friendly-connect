@@ -57,12 +57,15 @@ function AdminOffices() {
 
   return (
     <main className="mx-auto max-w-4xl px-6 py-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-foreground">Office locations</h1>
-        <p className="text-sm text-muted-foreground">Manage office locations admins can pick when posting jobs.</p>
-      </div>
+      <PageHeader
+        icon={MapPin}
+        eyebrow="Admin · Offices"
+        title="Office locations"
+        description="Manage office locations admins can pick when posting jobs."
+      />
 
-      <Card className="mb-6">
+      <Card className="mb-6 mt-6">
+
         <CardContent className="flex gap-2 p-4">
           <Input
             placeholder="New office name (e.g. Dhaka — Engineering)"
