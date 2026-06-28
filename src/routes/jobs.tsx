@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { POSITION_LABELS, type PositionType } from "@/lib/positions";
+import { POSITION_LABELS, DEPARTMENTS, type PositionType } from "@/lib/positions";
 import { Briefcase, MapPin, Clock } from "lucide-react";
 
 export const Route = createFileRoute("/jobs")({
@@ -26,6 +26,7 @@ export const Route = createFileRoute("/jobs")({
 function JobsPage() {
   const [search, setSearch] = useState("");
   const [posType, setPosType] = useState<string>("all");
+  const [dept, setDept] = useState<string>("all");
 
   const { data: jobs, isLoading } = useQuery({
     queryKey: ["public-jobs"],
@@ -47,7 +48,8 @@ function JobsPage() {
       j.title.toLowerCase().includes(search.toLowerCase()) ||
       (j.department ?? "").toLowerCase().includes(search.toLowerCase());
     const matchesType = posType === "all" || j.position_type === posType;
-    return matchesSearch && matchesType;
+    const matchesDept = dept === "all" || j.department === dept;
+    return matchesSearch && matchesType && matchesDept;
   });
 
   return (
@@ -74,6 +76,17 @@ function JobsPage() {
               <SelectItem value="all">All positions</SelectItem>
               {Object.entries(POSITION_LABELS).map(([v, l]) => (
                 <SelectItem key={v} value={v}>{l}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={dept} onValueChange={setDept}>
+            <SelectTrigger className="sm:w-56">
+              <SelectValue placeholder="All departments" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All departments</SelectItem>
+              {DEPARTMENTS.map((d) => (
+                <SelectItem key={d} value={d}>{d}</SelectItem>
               ))}
             </SelectContent>
           </Select>
