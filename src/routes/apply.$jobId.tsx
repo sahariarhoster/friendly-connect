@@ -248,7 +248,9 @@ function ApplyPage() {
             </form>
           </CardContent>
         </Card>
-      </main>
-    </div>
+        </main>
+      </div>
+    </AppShell>
   );
+
 }
