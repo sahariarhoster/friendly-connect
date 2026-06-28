@@ -6,13 +6,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { POSITION_LABELS, DEPARTMENTS, type PositionType } from "@/lib/positions";
-import { Plus, Pencil, Trash2, Link2 } from "lucide-react";
+import { POSITION_LABELS, OFFICES, CUSTOM_FIELDS, type PositionType, type CustomField, type CustomFieldType } from "@/lib/positions";
+import { useDepartments } from "@/hooks/useDepartments";
+import { Plus, Pencil, Trash2, Link2, GripVertical } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/jobs")({
@@ -31,10 +33,16 @@ type JobRow = {
   salary_range: string | null;
   status: string;
   deadline: string | null;
+  custom_fields: CustomField[];
+  use_position_defaults: boolean;
 };
 
 function emptyJob(): Partial<JobRow> {
-  return { title: "", department: "", position_type: "other", description: "", requirements: "", location: "", employment_type: "", salary_range: "", status: "draft", deadline: null };
+  return {
+    title: "", department: "", position_type: "other", description: "", requirements: "",
+    location: "", employment_type: "Full-time", salary_range: "", status: "draft", deadline: null,
+    custom_fields: [], use_position_defaults: true,
+  };
 }
 
 function AdminJobs() {
@@ -48,7 +56,7 @@ function AdminJobs() {
     queryFn: async () => {
       const { data, error } = await supabase.from("jobs").select("*").order("created_at", { ascending: false });
       if (error) throw error;
-      return (data ?? []) as JobRow[];
+      return (data ?? []) as unknown as JobRow[];
     },
   });
 
@@ -65,6 +73,8 @@ function AdminJobs() {
         salary_range: job.salary_range || null,
         status: job.status as "draft" | "open" | "closed",
         deadline: job.deadline || null,
+        custom_fields: (job.custom_fields ?? []) as unknown as never,
+        use_position_defaults: job.use_position_defaults ?? true,
       };
       if (job.id) {
         const { error } = await supabase.from("jobs").update(payload).eq("id", job.id);
@@ -98,7 +108,10 @@ function AdminJobs() {
   });
 
   function openNew() { setEditing(emptyJob()); setDialogOpen(true); }
-  function openEdit(j: JobRow) { setEditing({ ...j }); setDialogOpen(true); }
+  function openEdit(j: JobRow) {
+    setEditing({ ...j, custom_fields: j.custom_fields ?? [], use_position_defaults: j.use_position_defaults ?? true });
+    setDialogOpen(true);
+  }
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-8">
@@ -157,7 +170,7 @@ function AdminJobs() {
                         size="icon"
                         title="Copy apply link"
                         onClick={async () => {
-                          const url = `${window.location.origin}/jobs/${j.id}`;
+                          const url = `${window.location.origin}/apply/${j.id}`;
                           try {
                             await navigator.clipboard.writeText(url);
                             toast.success("Apply link copied", { description: url });
@@ -192,8 +205,13 @@ function JobDialog({
   onSubmit: () => void;
   saving: boolean;
 }) {
+  const { data: departments = [] } = useDepartments();
   if (!editing) return null;
   const set = (k: keyof JobRow, v: unknown) => setEditing({ ...editing, [k]: v });
+  const fields = editing.custom_fields ?? [];
+  const setFields = (next: CustomField[]) => set("custom_fields", next);
+  const defaults = CUSTOM_FIELDS[(editing.position_type ?? "other") as PositionType] ?? [];
+
   return (
     <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
       <DialogHeader>
@@ -232,19 +250,33 @@ function JobDialog({
             <Select value={editing.department ?? ""} onValueChange={(v) => set("department", v)}>
               <SelectTrigger><SelectValue placeholder="Select department" /></SelectTrigger>
               <SelectContent>
-                {DEPARTMENTS.map((d) => (
-                  <SelectItem key={d} value={d}>{d}</SelectItem>
+                {departments.map((d) => (
+                  <SelectItem key={d.id} value={d.name}>{d.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
           <div>
-            <Label>Location</Label>
-            <Input value={editing.location ?? ""} onChange={(e) => set("location", e.target.value)} />
+            <Label>Office location</Label>
+            <Select value={editing.location ?? ""} onValueChange={(v) => set("location", v)}>
+              <SelectTrigger><SelectValue placeholder="Select office" /></SelectTrigger>
+              <SelectContent>
+                {OFFICES.map((o) => (
+                  <SelectItem key={o} value={o}>{o}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div>
             <Label>Employment type</Label>
-            <Input placeholder="Full-time, Contract…" value={editing.employment_type ?? ""} onChange={(e) => set("employment_type", e.target.value)} />
+            <Select value={editing.employment_type ?? ""} onValueChange={(v) => set("employment_type", v)}>
+              <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+              <SelectContent>
+                {["Full-time", "Part-time", "Contract", "Internship", "Freelance"].map((t) => (
+                  <SelectItem key={t} value={t}>{t}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div>
             <Label>Salary range</Label>
@@ -263,6 +295,64 @@ function JobDialog({
           <Label>Requirements</Label>
           <Textarea rows={4} value={editing.requirements ?? ""} onChange={(e) => set("requirements", e.target.value)} />
         </div>
+
+        {/* Form builder */}
+        <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-4">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h3 className="font-semibold text-foreground">Application form questions</h3>
+              <p className="text-xs text-muted-foreground">Customize what applicants are asked for this role.</p>
+            </div>
+          </div>
+
+          {defaults.length > 0 && (
+            <div className="flex items-center justify-between rounded-md border border-border bg-background p-3">
+              <div>
+                <div className="text-sm font-medium">Include {POSITION_LABELS[editing.position_type as PositionType]} default questions</div>
+                <div className="text-xs text-muted-foreground">{defaults.map((d) => d.label).join(" · ")}</div>
+              </div>
+              <Switch
+                checked={editing.use_position_defaults ?? true}
+                onCheckedChange={(v) => set("use_position_defaults", v)}
+              />
+            </div>
+          )}
+
+          <div className="space-y-3">
+            {fields.length === 0 && (
+              <p className="text-xs text-muted-foreground">No custom questions yet. Add one below.</p>
+            )}
+            {fields.map((f, i) => (
+              <FieldEditor
+                key={i}
+                field={f}
+                onChange={(next) => setFields(fields.map((x, idx) => (idx === i ? next : x)))}
+                onRemove={() => setFields(fields.filter((_, idx) => idx !== i))}
+                onMove={(dir) => {
+                  const j = i + dir;
+                  if (j < 0 || j >= fields.length) return;
+                  const next = [...fields];
+                  [next[i], next[j]] = [next[j], next[i]];
+                  setFields(next);
+                }}
+              />
+            ))}
+          </div>
+
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              setFields([
+                ...fields,
+                { key: `q_${fields.length + 1}_${Math.random().toString(36).slice(2, 6)}`, label: "", type: "text", required: false },
+              ])
+            }
+          >
+            <Plus className="mr-1 h-4 w-4" /> Add question
+          </Button>
+        </div>
       </div>
       <DialogFooter>
         <Button onClick={onSubmit} disabled={saving || !editing.title || !editing.description}>
@@ -270,5 +360,66 @@ function JobDialog({
         </Button>
       </DialogFooter>
     </DialogContent>
+  );
+}
+
+function FieldEditor({
+  field, onChange, onRemove, onMove,
+}: {
+  field: CustomField;
+  onChange: (f: CustomField) => void;
+  onRemove: () => void;
+  onMove: (dir: -1 | 1) => void;
+}) {
+  return (
+    <div className="rounded-md border border-border bg-background p-3 space-y-3">
+      <div className="flex items-center gap-2">
+        <GripVertical className="h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Question label (e.g. Years of experience)"
+          value={field.label}
+          onChange={(e) => onChange({ ...field, label: e.target.value })}
+          className="flex-1"
+        />
+        <Button type="button" variant="ghost" size="icon" onClick={() => onMove(-1)} title="Move up">↑</Button>
+        <Button type="button" variant="ghost" size="icon" onClick={() => onMove(1)} title="Move down">↓</Button>
+        <Button type="button" variant="ghost" size="icon" onClick={onRemove} title="Remove">
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      </div>
+      <div className="grid gap-3 md:grid-cols-3">
+        <div>
+          <Label className="text-xs">Type</Label>
+          <Select value={field.type} onValueChange={(v) => onChange({ ...field, type: v as CustomFieldType })}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="text">Short text</SelectItem>
+              <SelectItem value="textarea">Long text</SelectItem>
+              <SelectItem value="url">URL</SelectItem>
+              <SelectItem value="number">Number</SelectItem>
+              <SelectItem value="select">Dropdown</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Label className="text-xs">Placeholder</Label>
+          <Input value={field.placeholder ?? ""} onChange={(e) => onChange({ ...field, placeholder: e.target.value })} />
+        </div>
+        <div className="flex items-end gap-2">
+          <Switch checked={!!field.required} onCheckedChange={(v) => onChange({ ...field, required: v })} />
+          <Label className="text-xs">Required</Label>
+        </div>
+      </div>
+      {field.type === "select" && (
+        <div>
+          <Label className="text-xs">Options (one per line)</Label>
+          <Textarea
+            rows={3}
+            value={(field.options ?? []).join("\n")}
+            onChange={(e) => onChange({ ...field, options: e.target.value.split("\n").map((s) => s.trim()).filter(Boolean) })}
+          />
+        </div>
+      )}
+    </div>
   );
 }
