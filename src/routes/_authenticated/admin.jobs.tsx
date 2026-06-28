@@ -336,6 +336,53 @@ function JobDialog({
           <Textarea rows={4} value={editing.requirements ?? ""} onChange={(e) => set("requirements", e.target.value)} />
         </div>
 
+        {/* Base fields toggles */}
+        <div className="rounded-xl border border-border bg-card p-5 space-y-3">
+          <div className="flex items-start gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-soft text-primary">
+              <FileText className="h-5 w-5" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-foreground">Built-in fields</h3>
+              <p className="text-xs text-muted-foreground">
+                Full name and Email are always shown. Toggle the rest per job.
+              </p>
+            </div>
+          </div>
+          <div className="divide-y divide-border rounded-lg border border-border">
+            {(Object.keys(BASE_FIELD_LABELS) as BaseFieldKey[]).map((key) => {
+              const cfg = getBaseField(baseFields, key);
+              return (
+                <div key={key} className="flex items-center justify-between gap-3 p-3">
+                  <div className="min-w-0">
+                    <div className="text-sm font-medium">{BASE_FIELD_LABELS[key]}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {cfg.enabled ? (cfg.required ? "Shown · Required" : "Shown · Optional") : "Hidden"}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                      Required
+                      <Switch
+                        checked={cfg.required}
+                        disabled={!cfg.enabled}
+                        onCheckedChange={(v) => updateBaseField(key, { required: v })}
+                      />
+                    </label>
+                    <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                      Show
+                      <Switch
+                        checked={cfg.enabled}
+                        onCheckedChange={(v) => updateBaseField(key, { enabled: v, required: v ? cfg.required : false })}
+                      />
+                    </label>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
         {/* Form builder */}
         <div className="rounded-xl border border-border bg-gradient-to-br from-primary-soft/40 to-card p-5 space-y-4">
           <div className="flex items-start justify-between gap-3">
