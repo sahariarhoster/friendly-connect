@@ -17,9 +17,10 @@ export function AppHeader() {
   const isAdmin = roles?.includes("admin");
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setUserId(data.user?.id);
-      setEmail(data.user?.email ?? undefined);
+    // getSession() reads from localStorage — instant, no network round-trip
+    supabase.auth.getSession().then(({ data }) => {
+      setUserId(data.session?.user?.id);
+      setEmail(data.session?.user?.email ?? undefined);
     });
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
       setUserId(s?.user?.id);

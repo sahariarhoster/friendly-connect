@@ -6,6 +6,7 @@ import { AppHeader } from "@/components/AppHeader";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { POSITION_LABELS, type PositionType } from "@/lib/positions";
 import { Briefcase, MapPin, Clock } from "lucide-react";
@@ -28,10 +29,11 @@ function JobsPage() {
 
   const { data: jobs, isLoading } = useQuery({
     queryKey: ["public-jobs"],
+    staleTime: 60_000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("jobs")
-        .select("*")
+        .select("id, title, department, position_type, description, location, deadline, status, created_at")
         .eq("status", "open")
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -78,7 +80,20 @@ function JobsPage() {
         </div>
 
         {isLoading ? (
-          <p className="text-muted-foreground">Loading…</p>
+          <div className="grid gap-4 md:grid-cols-2">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Card key={i}>
+                <CardHeader>
+                  <Skeleton className="h-5 w-2/3" />
+                  <Skeleton className="mt-2 h-4 w-1/3" />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="mt-2 h-4 w-5/6" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         ) : filtered.length === 0 ? (
           <Card>
             <CardContent className="py-16 text-center text-muted-foreground">
