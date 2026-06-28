@@ -111,6 +111,25 @@ function ApplyPage() {
     if (!job) return;
     const fd = new FormData(e.currentTarget);
     const fields = getActiveFields();
+    const bf = (job.base_fields ?? {}) as BaseFieldsConfig;
+    const phoneCfg = getBaseField(bf, "phone");
+    const portfolioCfg = getBaseField(bf, "portfolio_url");
+    const resumeCfg = getBaseField(bf, "resume");
+    const coverCfg = getBaseField(bf, "cover_letter");
+
+    if (phoneCfg.enabled && phoneCfg.required && !String(fd.get("phone") ?? "").trim()) {
+      toast.error("Phone is required"); return;
+    }
+    if (portfolioCfg.enabled && portfolioCfg.required && !String(fd.get("portfolio_url") ?? "").trim()) {
+      toast.error("Portfolio / LinkedIn URL is required"); return;
+    }
+    if (resumeCfg.enabled && resumeCfg.required && !resumeUrl) {
+      toast.error("Resume is required"); return;
+    }
+    if (coverCfg.enabled && coverCfg.required && !String(fd.get("cover_letter") ?? "").trim()) {
+      toast.error("Cover letter is required"); return;
+    }
+
     const custom_responses: Record<string, string> = {};
     for (const f of fields) {
       const v = f.type === "file" ? (fileResponses[f.key] ?? "") : String(fd.get(`cf_${f.key}`) ?? "");
@@ -125,10 +144,10 @@ function ApplyPage() {
       applicant_id: user?.id ?? null,
       full_name: String(fd.get("full_name") ?? ""),
       email: String(fd.get("email") ?? user?.email ?? ""),
-      phone: String(fd.get("phone") ?? "") || null,
-      cover_letter: String(fd.get("cover_letter") ?? "") || null,
-      portfolio_url: String(fd.get("portfolio_url") ?? "") || null,
-      resume_url: resumeUrl,
+      phone: phoneCfg.enabled ? (String(fd.get("phone") ?? "") || null) : null,
+      cover_letter: coverCfg.enabled ? (String(fd.get("cover_letter") ?? "") || null) : null,
+      portfolio_url: portfolioCfg.enabled ? (String(fd.get("portfolio_url") ?? "") || null) : null,
+      resume_url: resumeCfg.enabled ? resumeUrl : null,
       custom_responses,
     });
   }
