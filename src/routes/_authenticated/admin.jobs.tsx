@@ -40,6 +40,7 @@ type JobRow = {
   custom_fields: CustomField[];
   use_position_defaults: boolean;
   use_department_defaults: boolean;
+  base_fields: BaseFieldsConfig;
 };
 
 function emptyJob(): Partial<JobRow> {
@@ -47,6 +48,7 @@ function emptyJob(): Partial<JobRow> {
     title: "", department: "", position_type: "other", description: "", requirements: "",
     location: "", employment_type: "Full-time", salary_range: "", status: "draft", deadline: null,
     custom_fields: [], use_position_defaults: true, use_department_defaults: true,
+    base_fields: {},
   };
 }
 
