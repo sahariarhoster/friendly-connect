@@ -23,6 +23,7 @@ function ApplyPage() {
   const navigate = useNavigate();
   const [uploading, setUploading] = useState(false);
   const [resumeUrl, setResumeUrl] = useState<string | null>(null);
+  const [fileResponses, setFileResponses] = useState<Record<string, string>>({});
   const [user, setUser] = useState<{ id: string; email: string | null } | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
@@ -62,6 +63,17 @@ function ApplyPage() {
     if (error) return toast.error(error.message);
     setResumeUrl(path);
     toast.success("Resume uploaded");
+  }
+
+  async function handleFieldFileUpload(key: string, file: File) {
+    setUploading(true);
+    const folder = user?.id ?? `guest/${crypto.randomUUID()}`;
+    const path = `${folder}/${jobId}-${key}-${Date.now()}-${file.name}`;
+    const { error } = await supabase.storage.from("resumes").upload(path, file, { upsert: true });
+    setUploading(false);
+    if (error) return toast.error(error.message);
+    setFileResponses((p) => ({ ...p, [key]: path }));
+    toast.success(`${file.name} uploaded`);
   }
 
   function getActiveFields(): CustomField[] {
