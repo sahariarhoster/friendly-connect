@@ -123,6 +123,7 @@ function AdminJobs() {
       custom_fields: j.custom_fields ?? [],
       use_position_defaults: j.use_position_defaults ?? true,
       use_department_defaults: j.use_department_defaults ?? true,
+      base_fields: (j.base_fields ?? {}) as BaseFieldsConfig,
     });
     setDialogOpen(true);
   }
