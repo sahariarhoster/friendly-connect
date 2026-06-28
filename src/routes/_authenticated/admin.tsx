@@ -26,6 +26,7 @@ function AdminLayout() {
   const tabs = [
     { to: "/admin/jobs", label: "Job posts" },
     { to: "/admin/applications", label: "Applications" },
+    { to: "/admin/departments", label: "Departments" },
   ];
 
   return (
