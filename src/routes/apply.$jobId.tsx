@@ -123,13 +123,26 @@ function ApplyPage() {
     });
   }
 
-  if (isLoading || !job) {
+  if (isLoading) {
     return (
       <AppShell>
         <div className="mx-auto max-w-3xl px-6 py-16 text-center text-muted-foreground">Loading…</div>
       </AppShell>
     );
   }
+
+  if (!job) {
+    return (
+      <AppShell>
+        <div className="mx-auto max-w-2xl px-6 py-20 text-center">
+          <h1 className="text-2xl font-bold">Job not available</h1>
+          <p className="mt-2 text-muted-foreground">This posting may have been closed or removed.</p>
+          <Link to="/jobs"><Button className="mt-6">Browse open roles</Button></Link>
+        </div>
+      </AppShell>
+    );
+  }
+
 
   if (submitted) {
     return (
