@@ -64,9 +64,15 @@ function ApplyPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  async function resolveFolder() {
+    const { data } = await supabase.auth.getSession();
+    const uid = data.session?.user?.id ?? user?.id;
+    return uid ? uid : `guest/${crypto.randomUUID()}`;
+  }
+
   async function handleResumeUpload(file: File) {
     setUploading(true);
-    const folder = user?.id ?? `guest/${crypto.randomUUID()}`;
+    const folder = await resolveFolder();
     const path = `${folder}/${jobId}-${Date.now()}-${file.name}`;
     const { error } = await supabase.storage.from("resumes").upload(path, file, { upsert: true });
     setUploading(false);
@@ -77,7 +83,7 @@ function ApplyPage() {
 
   async function handleFieldFileUpload(key: string, file: File) {
     setUploading(true);
-    const folder = user?.id ?? `guest/${crypto.randomUUID()}`;
+    const folder = await resolveFolder();
     const path = `${folder}/${jobId}-${key}-${Date.now()}-${file.name}`;
     const { error } = await supabase.storage.from("resumes").upload(path, file, { upsert: true });
     setUploading(false);
