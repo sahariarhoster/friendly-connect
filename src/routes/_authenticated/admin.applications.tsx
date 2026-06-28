@@ -10,7 +10,10 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { APPLICATION_STATUSES, STATUS_LABELS } from "@/lib/positions";
+import { PageHeader, EmptyState } from "@/components/PageHeader";
+import { Inbox } from "lucide-react";
 import { toast } from "sonner";
+
 
 export const Route = createFileRoute("/_authenticated/admin/applications")({
   component: AdminApplications,
