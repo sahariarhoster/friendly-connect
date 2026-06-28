@@ -103,8 +103,49 @@ export const DEPARTMENT_DEFAULTS: Record<string, CustomField[]> = {
   ],
 };
 
+const DEPARTMENT_ALIASES: Record<string, string> = {
+  hr: "human resources",
+  "people": "human resources",
+  "people ops": "human resources",
+  "talent": "human resources",
+  finance: "finance",
+  accounts: "finance",
+  accounting: "finance",
+  marketing: "marketing",
+  growth: "marketing",
+  "social media": "marketing",
+  operations: "operations",
+  ops: "operations",
+  product: "product",
+  pm: "product",
+  sales: "sales",
+  "business development": "sales",
+  bd: "sales",
+  engineering: "engineering",
+  eng: "engineering",
+  tech: "engineering",
+  development: "engineering",
+  dev: "engineering",
+  it: "engineering",
+  design: "design",
+  creative: "design",
+  ux: "design",
+  ui: "design",
+};
+
 export function getDepartmentDefaults(name: string): CustomField[] {
-  return DEPARTMENT_DEFAULTS[name.trim().toLowerCase()] ?? [];
+  const key = name.trim().toLowerCase();
+  if (DEPARTMENT_DEFAULTS[key]) return DEPARTMENT_DEFAULTS[key];
+  const alias = DEPARTMENT_ALIASES[key];
+  if (alias && DEPARTMENT_DEFAULTS[alias]) return DEPARTMENT_DEFAULTS[alias];
+  // partial contains match
+  for (const [k, v] of Object.entries(DEPARTMENT_DEFAULTS)) {
+    if (key.includes(k) || k.includes(key)) return v;
+  }
+  for (const [k, target] of Object.entries(DEPARTMENT_ALIASES)) {
+    if (key.includes(k)) return DEPARTMENT_DEFAULTS[target] ?? [];
+  }
+  return [];
 }
 
 export const APPLICATION_STATUSES = [
