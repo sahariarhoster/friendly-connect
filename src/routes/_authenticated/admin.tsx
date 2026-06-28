@@ -2,7 +2,8 @@ import { createFileRoute, Outlet, useNavigate, Link, useRouterState } from "@tan
 import { useEffect } from "react";
 
 import { useRoles } from "@/hooks/useRoles";
-import { Button } from "@/components/ui/button";
+import { Briefcase, Inbox, Building2, MapPin } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminLayout,
@@ -24,24 +25,31 @@ function AdminLayout() {
   if (!roles?.includes("admin")) return null;
 
   const tabs = [
-    { to: "/admin/jobs", label: "Job posts" },
-    { to: "/admin/applications", label: "Applications" },
-    { to: "/admin/departments", label: "Departments" },
-    { to: "/admin/offices", label: "Offices" },
+    { to: "/admin/jobs", label: "Job posts", icon: Briefcase },
+    { to: "/admin/applications", label: "Applications", icon: Inbox },
+    { to: "/admin/departments", label: "Departments", icon: Building2 },
+    { to: "/admin/offices", label: "Offices", icon: MapPin },
   ];
 
   return (
     <div>
-      <div className="border-b border-border bg-card/50">
-
-        <div className="mx-auto flex max-w-7xl gap-1 px-6">
+      <div className="sticky top-0 z-10 border-b border-border bg-background/80 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-6">
           {tabs.map((t) => {
             const active = pathname.startsWith(t.to);
             return (
-              <Link key={t.to} to={t.to}>
-                <Button variant="ghost" size="sm" className={active ? "border-b-2 border-primary rounded-none" : "rounded-none"}>
-                  {t.label}
-                </Button>
+              <Link
+                key={t.to}
+                to={t.to}
+                className={cn(
+                  "inline-flex items-center gap-2 border-b-2 px-3 py-3 text-sm font-medium transition whitespace-nowrap",
+                  active
+                    ? "border-primary text-primary"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <t.icon className="h-4 w-4" />
+                {t.label}
               </Link>
             );
           })}
@@ -51,3 +59,4 @@ function AdminLayout() {
     </div>
   );
 }
+
