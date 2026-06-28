@@ -213,7 +213,14 @@ function JobDialog({
           </div>
           <div>
             <Label>Department</Label>
-            <Input value={editing.department ?? ""} onChange={(e) => set("department", e.target.value)} />
+            <Select value={editing.department ?? ""} onValueChange={(v) => set("department", v)}>
+              <SelectTrigger><SelectValue placeholder="Select department" /></SelectTrigger>
+              <SelectContent>
+                {DEPARTMENTS.map((d) => (
+                  <SelectItem key={d} value={d}>{d}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div>
             <Label>Location</Label>
