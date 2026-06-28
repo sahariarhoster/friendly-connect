@@ -127,6 +127,7 @@ function Dashboard() {
               <ActionTile to="/applications" icon={FileText} title="My applications" desc="Track the status of every application." />
             </div>
           </>
+        )}
       </main>
   );
 }
