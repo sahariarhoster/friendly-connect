@@ -17,12 +17,15 @@ export const POSITION_LABELS: Record<PositionType, string> = {
   other: "Other",
 };
 
+export type CustomFieldType = "text" | "textarea" | "url" | "number" | "select";
+
 export type CustomField = {
   key: string;
   label: string;
-  type: "text" | "textarea" | "url" | "number";
+  type: CustomFieldType;
   placeholder?: string;
   required?: boolean;
+  options?: string[]; // for select
 };
 
 export const CUSTOM_FIELDS: Record<PositionType, CustomField[]> = {
@@ -74,17 +77,10 @@ export const STATUS_LABELS: Record<string, string> = {
   hired: "Hired",
 };
 
-export const DEPARTMENTS = [
-  "Engineering",
-  "Design",
-  "Marketing",
-  "Content",
-  "Social Media",
-  "Video Production",
-  "Sales",
-  "Operations",
-  "Human Resources",
-  "Finance",
-  "Customer Support",
+// Office locations — admins pick one when creating a job
+export const OFFICES = [
+  "Dhaka — Head Office",
+  "Dhaka — Creative Team Office",
+  "Dhaka — Customer Support Office",
+  "Remote",
 ] as const;
-
