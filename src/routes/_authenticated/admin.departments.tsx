@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { useDepartments, type Department } from "@/hooks/useDepartments";
 import { QuestionsDialog } from "@/components/QuestionsDialog";
 import { type CustomField, getDepartmentDefaults } from "@/lib/positions";
-import { Plus, Trash2, Building2, ListChecks, Sparkles } from "lucide-react";
+import { Plus, Trash2, Building2, ListChecks } from "lucide-react";
 import { PageHeader, EmptyState } from "@/components/PageHeader";
 import { toast } from "sonner";
 
