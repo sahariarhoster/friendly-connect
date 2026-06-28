@@ -103,7 +103,7 @@ function ApplyPage() {
     const fields = getActiveFields();
     const custom_responses: Record<string, string> = {};
     for (const f of fields) {
-      const v = String(fd.get(`cf_${f.key}`) ?? "");
+      const v = f.type === "file" ? (fileResponses[f.key] ?? "") : String(fd.get(`cf_${f.key}`) ?? "");
       if (f.required && !v.trim()) {
         toast.error(`${f.label} is required`);
         return;
@@ -235,6 +235,19 @@ function ApplyPage() {
                             ))}
                           </SelectContent>
                         </Select>
+                      ) : f.type === "file" ? (
+                        <>
+                          <Input
+                            id={`cf_${f.key}`}
+                            type="file"
+                            accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) handleFieldFileUpload(f.key, file);
+                            }}
+                          />
+                          {fileResponses[f.key] && <p className="mt-1 text-xs text-primary">Uploaded ✓</p>}
+                        </>
                       ) : (
                         <Input
                           id={`cf_${f.key}`}
