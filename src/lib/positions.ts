@@ -73,3 +73,18 @@ export const STATUS_LABELS: Record<string, string> = {
   rejected: "Rejected",
   hired: "Hired",
 };
+
+export const DEPARTMENTS = [
+  "Engineering",
+  "Design",
+  "Marketing",
+  "Content",
+  "Social Media",
+  "Video Production",
+  "Sales",
+  "Operations",
+  "Human Resources",
+  "Finance",
+  "Customer Support",
+] as const;
+
