@@ -48,7 +48,8 @@ function JobsPage() {
       j.title.toLowerCase().includes(search.toLowerCase()) ||
       (j.department ?? "").toLowerCase().includes(search.toLowerCase());
     const matchesType = posType === "all" || j.position_type === posType;
-    return matchesSearch && matchesType;
+    const matchesDept = dept === "all" || j.department === dept;
+    return matchesSearch && matchesType && matchesDept;
   });
 
   return (
