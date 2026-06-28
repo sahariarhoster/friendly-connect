@@ -14,10 +14,34 @@ export type Database = {
   }
   public: {
     Tables: {
+      departments: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       job_applications: {
         Row: {
           admin_notes: string | null
-          applicant_id: string
+          applicant_id: string | null
           cover_letter: string | null
           created_at: string
           custom_responses: Json
@@ -33,7 +57,7 @@ export type Database = {
         }
         Insert: {
           admin_notes?: string | null
-          applicant_id: string
+          applicant_id?: string | null
           cover_letter?: string | null
           created_at?: string
           custom_responses?: Json
@@ -49,7 +73,7 @@ export type Database = {
         }
         Update: {
           admin_notes?: string | null
-          applicant_id?: string
+          applicant_id?: string | null
           cover_letter?: string | null
           created_at?: string
           custom_responses?: Json
@@ -77,6 +101,7 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string | null
+          custom_fields: Json
           deadline: string | null
           department: string | null
           description: string
@@ -89,10 +114,12 @@ export type Database = {
           status: Database["public"]["Enums"]["job_status"]
           title: string
           updated_at: string
+          use_position_defaults: boolean
         }
         Insert: {
           created_at?: string
           created_by?: string | null
+          custom_fields?: Json
           deadline?: string | null
           department?: string | null
           description: string
@@ -105,10 +132,12 @@ export type Database = {
           status?: Database["public"]["Enums"]["job_status"]
           title: string
           updated_at?: string
+          use_position_defaults?: boolean
         }
         Update: {
           created_at?: string
           created_by?: string | null
+          custom_fields?: Json
           deadline?: string | null
           department?: string | null
           description?: string
@@ -121,6 +150,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["job_status"]
           title?: string
           updated_at?: string
+          use_position_defaults?: boolean
         }
         Relationships: []
       }
