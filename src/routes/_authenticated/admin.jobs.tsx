@@ -246,6 +246,11 @@ function JobDialog({
   const positionDefaults = CUSTOM_FIELDS[(editing.position_type ?? "other") as PositionType] ?? [];
   const selectedDept = departments.find((d) => d.name === editing.department);
   const departmentDefaults = selectedDept?.custom_fields ?? [];
+  const baseFields = (editing.base_fields ?? {}) as BaseFieldsConfig;
+  const updateBaseField = (key: BaseFieldKey, patch: Partial<{ enabled: boolean; required: boolean }>) => {
+    const current = { ...BASE_FIELD_DEFAULTS[key], ...(baseFields[key] ?? {}) };
+    set("base_fields", { ...baseFields, [key]: { ...current, ...patch } });
+  };
 
   return (
     <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
