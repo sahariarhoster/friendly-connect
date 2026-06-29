@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { APPLICATION_STATUSES, STATUS_LABELS } from "@/lib/positions";
-import { ArrowLeft, Mail, Phone, FileText, ExternalLink, UserCircle2, NotebookPen } from "lucide-react";
+import { ArrowLeft, Mail, Phone, FileText, ExternalLink, UserCircle2, NotebookPen, Trash2, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/applications/$appId")({
