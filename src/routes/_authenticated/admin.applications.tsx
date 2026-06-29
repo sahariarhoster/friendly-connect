@@ -1,13 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { APPLICATION_STATUSES, STATUS_LABELS } from "@/lib/positions";
 import { PageHeader, EmptyState } from "@/components/PageHeader";
@@ -148,7 +145,9 @@ function AdminApplications() {
                       </Select>
                     </TableCell>
                     <TableCell className="text-right">
-                      <ApplicantSheet app={a} />
+                      <Link to="/admin/applications/$appId" params={{ appId: a.id }}>
+                        <Button variant="outline" size="sm">View</Button>
+                      </Link>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -158,103 +157,5 @@ function AdminApplications() {
         </CardContent>
       </Card>
     </main>
-  );
-}
-
-
-function ApplicantSheet({ app }: { app: AppRow }) {
-  const qc = useQueryClient();
-  const [notes, setNotes] = useState(app.admin_notes ?? "");
-  const [resumeSignedUrl, setResumeSignedUrl] = useState<string | null>(null);
-
-  async function loadResume() {
-    if (!app.resume_url) return;
-    const { data } = await supabase.storage.from("resumes").createSignedUrl(app.resume_url, 300);
-    setResumeSignedUrl(data?.signedUrl ?? null);
-  }
-
-  const saveNotes = useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase.from("job_applications").update({ admin_notes: notes }).eq("id", app.id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["admin-applications"] });
-      toast.success("Notes saved");
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
-
-  return (
-    <Sheet onOpenChange={(o) => o && loadResume()}>
-      <SheetTrigger asChild>
-        <Button variant="outline" size="sm">View</Button>
-      </SheetTrigger>
-      <SheetContent className="w-full overflow-y-auto sm:max-w-xl">
-        <SheetHeader>
-          <SheetTitle>{app.full_name}</SheetTitle>
-        </SheetHeader>
-        <div className="mt-6 space-y-5">
-          <div>
-            <div className="text-xs uppercase text-muted-foreground">Contact</div>
-            <div className="text-sm">{app.email}</div>
-            {app.phone && <div className="text-sm">{app.phone}</div>}
-            {app.portfolio_url && (
-              <a href={app.portfolio_url} target="_blank" rel="noreferrer" className="text-sm text-primary underline">
-                Portfolio / LinkedIn
-              </a>
-            )}
-          </div>
-
-          <div>
-            <div className="text-xs uppercase text-muted-foreground">Applied for</div>
-            <div className="text-sm">{app.jobs?.title}</div>
-            <Badge variant="secondary" className="mt-1">{STATUS_LABELS[app.status]}</Badge>
-          </div>
-
-          {app.resume_url && (
-            <div>
-              <div className="text-xs uppercase text-muted-foreground">Resume</div>
-              {resumeSignedUrl ? (
-                <a href={resumeSignedUrl} target="_blank" rel="noreferrer" className="text-sm text-primary underline">
-                  Open resume
-                </a>
-              ) : (
-                <Button size="sm" variant="outline" onClick={loadResume}>Load resume</Button>
-              )}
-            </div>
-          )}
-
-          {app.cover_letter && (
-            <div>
-              <div className="text-xs uppercase text-muted-foreground">Cover letter</div>
-              <p className="whitespace-pre-wrap text-sm">{app.cover_letter}</p>
-            </div>
-          )}
-
-          {Object.keys(app.custom_responses ?? {}).length > 0 && (
-            <div>
-              <div className="mb-2 text-xs uppercase text-muted-foreground">Position-specific answers</div>
-              <div className="space-y-3 rounded border border-border bg-muted/30 p-3">
-                {Object.entries(app.custom_responses).map(([k, v]) => (
-                  <div key={k}>
-                    <div className="text-xs font-medium text-foreground">{k.replace(/_/g, " ")}</div>
-                    <div className="text-sm text-muted-foreground">{v || "—"}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div>
-            <div className="text-xs uppercase text-muted-foreground">Internal notes</div>
-            <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={4} className="mt-1" />
-            <Button size="sm" className="mt-2" onClick={() => saveNotes.mutate()} disabled={saveNotes.isPending}>
-              Save notes
-            </Button>
-          </div>
-        </div>
-      </SheetContent>
-    </Sheet>
   );
 }
