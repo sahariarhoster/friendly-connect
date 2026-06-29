@@ -29,10 +29,23 @@ type AppRow = {
   jobs: { title: string; position_type: string } | null;
 };
 
+type Note = { id: string; text: string; author: string | null; created_at: string };
+
+function parseNotes(raw: string | null): Note[] {
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) return parsed as Note[];
+  } catch {
+    // legacy single string
+  }
+  return [{ id: "legacy", text: raw, author: null, created_at: "" }];
+}
+
 function ApplicationDetail() {
   const { appId } = Route.useParams();
   const qc = useQueryClient();
-  const [notes, setNotes] = useState("");
+  const [draft, setDraft] = useState("");
   const [resumeSignedUrl, setResumeSignedUrl] = useState<string | null>(null);
 
   const { data: app, isLoading } = useQuery({
@@ -48,9 +61,7 @@ function ApplicationDetail() {
     },
   });
 
-  useEffect(() => {
-    if (app) setNotes(app.admin_notes ?? "");
-  }, [app]);
+  const notes = parseNotes(app?.admin_notes ?? null);
 
   useEffect(() => {
     (async () => {
@@ -73,14 +84,35 @@ function ApplicationDetail() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const saveNotes = useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase.from("job_applications").update({ admin_notes: notes }).eq("id", appId);
+  const persistNotes = useMutation({
+    mutationFn: async (next: Note[]) => {
+      const { error } = await supabase
+        .from("job_applications")
+        .update({ admin_notes: JSON.stringify(next) })
+        .eq("id", appId);
       if (error) throw error;
     },
-    onSuccess: () => toast.success("Notes saved"),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-application", appId] }),
     onError: (e: Error) => toast.error(e.message),
   });
+
+  const addNote = async () => {
+    const text = draft.trim();
+    if (!text) return;
+    const { data: u } = await supabase.auth.getUser();
+    const note: Note = {
+      id: crypto.randomUUID(),
+      text,
+      author: u.user?.email ?? null,
+      created_at: new Date().toISOString(),
+    };
+    setDraft("");
+    persistNotes.mutate([...notes, note]);
+  };
+
+  const deleteNote = (id: string) => {
+    persistNotes.mutate(notes.filter((n) => n.id !== id));
+  };
 
   if (isLoading) {
     return <main className="mx-auto max-w-6xl px-6 py-12 text-muted-foreground">Loading…</main>;
@@ -93,6 +125,7 @@ function ApplicationDetail() {
       </main>
     );
   }
+
 
   const responses = Object.entries(app.custom_responses ?? {});
 
