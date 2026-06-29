@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { APPLICATION_STATUSES, STATUS_LABELS } from "@/lib/positions";
-import { ArrowLeft, Mail, Phone, FileText, ExternalLink, UserCircle2, NotebookPen } from "lucide-react";
+import { ArrowLeft, Mail, Phone, FileText, ExternalLink, UserCircle2, NotebookPen, Trash2, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/applications/$appId")({
@@ -29,10 +29,23 @@ type AppRow = {
   jobs: { title: string; position_type: string } | null;
 };
 
+type Note = { id: string; text: string; author: string | null; created_at: string };
+
+function parseNotes(raw: string | null): Note[] {
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) return parsed as Note[];
+  } catch {
+    // legacy single string
+  }
+  return [{ id: "legacy", text: raw, author: null, created_at: "" }];
+}
+
 function ApplicationDetail() {
   const { appId } = Route.useParams();
   const qc = useQueryClient();
-  const [notes, setNotes] = useState("");
+  const [draft, setDraft] = useState("");
   const [resumeSignedUrl, setResumeSignedUrl] = useState<string | null>(null);
 
   const { data: app, isLoading } = useQuery({
@@ -48,9 +61,7 @@ function ApplicationDetail() {
     },
   });
 
-  useEffect(() => {
-    if (app) setNotes(app.admin_notes ?? "");
-  }, [app]);
+  const notes = parseNotes(app?.admin_notes ?? null);
 
   useEffect(() => {
     (async () => {
@@ -73,14 +84,35 @@ function ApplicationDetail() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const saveNotes = useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase.from("job_applications").update({ admin_notes: notes }).eq("id", appId);
+  const persistNotes = useMutation({
+    mutationFn: async (next: Note[]) => {
+      const { error } = await supabase
+        .from("job_applications")
+        .update({ admin_notes: JSON.stringify(next) })
+        .eq("id", appId);
       if (error) throw error;
     },
-    onSuccess: () => toast.success("Notes saved"),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-application", appId] }),
     onError: (e: Error) => toast.error(e.message),
   });
+
+  const addNote = async () => {
+    const text = draft.trim();
+    if (!text) return;
+    const { data: u } = await supabase.auth.getUser();
+    const note: Note = {
+      id: crypto.randomUUID(),
+      text,
+      author: u.user?.email ?? null,
+      created_at: new Date().toISOString(),
+    };
+    setDraft("");
+    persistNotes.mutate([...notes, note]);
+  };
+
+  const deleteNote = (id: string) => {
+    persistNotes.mutate(notes.filter((n) => n.id !== id));
+  };
 
   if (isLoading) {
     return <main className="mx-auto max-w-6xl px-6 py-12 text-muted-foreground">Loading…</main>;
@@ -93,6 +125,7 @@ function ApplicationDetail() {
       </main>
     );
   }
+
 
   const responses = Object.entries(app.custom_responses ?? {});
 
@@ -271,20 +304,72 @@ function ApplicationDetail() {
                 <NotebookPen className="h-3 w-3" />
                 Internal Review Notes
               </label>
-              <Textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Add internal notes about this candidate's interview or portfolio…"
-                className="min-h-[160px] resize-none rounded-xl bg-muted/40"
-              />
-              <Button
-                onClick={() => saveNotes.mutate()}
-                disabled={saveNotes.isPending}
-                className="w-full rounded-xl bg-foreground py-3 text-sm font-semibold text-background hover:bg-foreground/90"
-              >
-                Save Review Changes
-              </Button>
+
+              {notes.length === 0 ? (
+                <p className="text-xs text-muted-foreground">No notes yet. Add the first one below.</p>
+              ) : (
+                <ul className="space-y-3">
+                  {notes.map((n) => (
+                    <li
+                      key={n.id}
+                      className="group relative rounded-xl border border-border/60 bg-muted/40 p-3"
+                    >
+                      <div className="flex items-center justify-between gap-2 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                        <span className="truncate">
+                          {n.author ?? "Unknown"}
+                          {n.created_at && (
+                            <>
+                              {" · "}
+                              {new Date(n.created_at).toLocaleString(undefined, {
+                                month: "short",
+                                day: "numeric",
+                                hour: "numeric",
+                                minute: "2-digit",
+                              })}
+                            </>
+                          )}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => deleteNote(n.id)}
+                          className="opacity-0 transition-opacity hover:text-destructive group-hover:opacity-100"
+                          aria-label="Delete note"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                      <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-foreground/85">
+                        {n.text}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              <div className="space-y-2 border-t border-border/60 pt-4">
+                <Textarea
+                  value={draft}
+                  onChange={(e) => setDraft(e.target.value)}
+                  onKeyDown={(e) => {
+                    if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+                      e.preventDefault();
+                      addNote();
+                    }
+                  }}
+                  placeholder="Write a note… (⌘/Ctrl + Enter to add)"
+                  className="min-h-[90px] resize-none rounded-xl bg-muted/40"
+                />
+                <Button
+                  onClick={addNote}
+                  disabled={!draft.trim() || persistNotes.isPending}
+                  className="w-full rounded-xl bg-foreground py-3 text-sm font-semibold text-background hover:bg-foreground/90"
+                >
+                  <Plus className="h-4 w-4" />
+                  Add note
+                </Button>
+              </div>
             </div>
+
           </div>
         </div>
       </div>
