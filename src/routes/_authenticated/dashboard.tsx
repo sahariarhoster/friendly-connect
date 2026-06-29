@@ -39,7 +39,7 @@ type RecentJob = {
   id: string;
   title: string;
   department: string | null;
-  location_office: string | null;
+  location: string | null;
   status: string;
   created_at: string;
 };
@@ -192,7 +192,7 @@ function Dashboard() {
     queryFn: async () => {
       const { data } = await supabase
         .from("jobs")
-        .select("id, title, department, location_office, status, created_at")
+        .select("id, title, department, location, status, created_at")
         .eq("status", "open")
         .order("created_at", { ascending: false })
         .limit(5);
@@ -466,7 +466,7 @@ function ApplicantView({
                     >
                       <p className="truncate text-sm font-medium text-foreground">{j.title}</p>
                       <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                        {[j.department, j.location_office].filter(Boolean).join(" · ") || "—"}
+                        {[j.department, j.location].filter(Boolean).join(" · ") || "—"}
                       </p>
                     </Link>
                   </li>
