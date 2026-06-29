@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { AppShell } from "@/components/AppShell";
+
 import {
   ArrowRight,
   Sparkles,
@@ -70,7 +70,7 @@ const STEPS = [
 
 function Landing() {
   return (
-    <AppShell>
+    <>
       <div className="space-y-10 p-4 sm:p-6 lg:p-8">
         {/* Internal-only banner */}
         <div className="flex flex-wrap items-center justify-center gap-2 rounded-full border border-primary/20 bg-primary-soft/60 px-4 py-2 text-xs font-medium text-primary sm:text-sm">
@@ -237,6 +237,6 @@ function Landing() {
           </a>
         </footer>
       </div>
-    </AppShell>
+    </>
   );
 }
