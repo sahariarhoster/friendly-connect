@@ -304,20 +304,72 @@ function ApplicationDetail() {
                 <NotebookPen className="h-3 w-3" />
                 Internal Review Notes
               </label>
-              <Textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Add internal notes about this candidate's interview or portfolio…"
-                className="min-h-[160px] resize-none rounded-xl bg-muted/40"
-              />
-              <Button
-                onClick={() => saveNotes.mutate()}
-                disabled={saveNotes.isPending}
-                className="w-full rounded-xl bg-foreground py-3 text-sm font-semibold text-background hover:bg-foreground/90"
-              >
-                Save Review Changes
-              </Button>
+
+              {notes.length === 0 ? (
+                <p className="text-xs text-muted-foreground">No notes yet. Add the first one below.</p>
+              ) : (
+                <ul className="space-y-3">
+                  {notes.map((n) => (
+                    <li
+                      key={n.id}
+                      className="group relative rounded-xl border border-border/60 bg-muted/40 p-3"
+                    >
+                      <div className="flex items-center justify-between gap-2 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                        <span className="truncate">
+                          {n.author ?? "Unknown"}
+                          {n.created_at && (
+                            <>
+                              {" · "}
+                              {new Date(n.created_at).toLocaleString(undefined, {
+                                month: "short",
+                                day: "numeric",
+                                hour: "numeric",
+                                minute: "2-digit",
+                              })}
+                            </>
+                          )}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => deleteNote(n.id)}
+                          className="opacity-0 transition-opacity hover:text-destructive group-hover:opacity-100"
+                          aria-label="Delete note"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                      <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-foreground/85">
+                        {n.text}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              <div className="space-y-2 border-t border-border/60 pt-4">
+                <Textarea
+                  value={draft}
+                  onChange={(e) => setDraft(e.target.value)}
+                  onKeyDown={(e) => {
+                    if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+                      e.preventDefault();
+                      addNote();
+                    }
+                  }}
+                  placeholder="Write a note… (⌘/Ctrl + Enter to add)"
+                  className="min-h-[90px] resize-none rounded-xl bg-muted/40"
+                />
+                <Button
+                  onClick={addNote}
+                  disabled={!draft.trim() || persistNotes.isPending}
+                  className="w-full rounded-xl bg-foreground py-3 text-sm font-semibold text-background hover:bg-foreground/90"
+                >
+                  <Plus className="h-4 w-4" />
+                  Add note
+                </Button>
+              </div>
             </div>
+
           </div>
         </div>
       </div>
