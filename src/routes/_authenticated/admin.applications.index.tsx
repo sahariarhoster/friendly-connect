@@ -145,9 +145,9 @@ function AdminApplications() {
                       </Select>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Link to="/admin/applications/$appId" params={{ appId: a.id }}>
-                        <Button variant="outline" size="sm">View</Button>
-                      </Link>
+                      <Button asChild variant="outline" size="sm">
+                        <Link to="/admin/applications/$appId" params={{ appId: a.id }}>View</Link>
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}
