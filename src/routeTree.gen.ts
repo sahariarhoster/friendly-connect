@@ -24,6 +24,7 @@ import { Route as AuthenticatedAdminOfficesRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminJobsRouteImport } from './routes/_authenticated/admin.jobs'
 import { Route as AuthenticatedAdminDepartmentsRouteImport } from './routes/_authenticated/admin.departments'
 import { Route as AuthenticatedAdminApplicationsRouteImport } from './routes/_authenticated/admin.applications'
+import { Route as AuthenticatedAdminApplicationsAppIdRouteImport } from './routes/_authenticated/admin.applications.$appId'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -103,6 +104,12 @@ const AuthenticatedAdminApplicationsRoute =
     path: '/applications',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminApplicationsAppIdRoute =
+  AuthenticatedAdminApplicationsAppIdRouteImport.update({
+    id: '/$appId',
+    path: '/$appId',
+    getParentRoute: () => AuthenticatedAdminApplicationsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -114,11 +121,12 @@ export interface FileRoutesByFullPath {
   '/apply/$jobId': typeof ApplyJobIdRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/jobs/': typeof JobsIndexRoute
-  '/admin/applications': typeof AuthenticatedAdminApplicationsRoute
+  '/admin/applications': typeof AuthenticatedAdminApplicationsRouteWithChildren
   '/admin/departments': typeof AuthenticatedAdminDepartmentsRoute
   '/admin/jobs': typeof AuthenticatedAdminJobsRoute
   '/admin/offices': typeof AuthenticatedAdminOfficesRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/admin/applications/$appId': typeof AuthenticatedAdminApplicationsAppIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -129,11 +137,12 @@ export interface FileRoutesByTo {
   '/apply/$jobId': typeof ApplyJobIdRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/jobs': typeof JobsIndexRoute
-  '/admin/applications': typeof AuthenticatedAdminApplicationsRoute
+  '/admin/applications': typeof AuthenticatedAdminApplicationsRouteWithChildren
   '/admin/departments': typeof AuthenticatedAdminDepartmentsRoute
   '/admin/jobs': typeof AuthenticatedAdminJobsRoute
   '/admin/offices': typeof AuthenticatedAdminOfficesRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/admin/applications/$appId': typeof AuthenticatedAdminApplicationsAppIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -147,11 +156,12 @@ export interface FileRoutesById {
   '/apply/$jobId': typeof ApplyJobIdRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/jobs/': typeof JobsIndexRoute
-  '/_authenticated/admin/applications': typeof AuthenticatedAdminApplicationsRoute
+  '/_authenticated/admin/applications': typeof AuthenticatedAdminApplicationsRouteWithChildren
   '/_authenticated/admin/departments': typeof AuthenticatedAdminDepartmentsRoute
   '/_authenticated/admin/jobs': typeof AuthenticatedAdminJobsRoute
   '/_authenticated/admin/offices': typeof AuthenticatedAdminOfficesRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/admin/applications/$appId': typeof AuthenticatedAdminApplicationsAppIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -170,6 +180,7 @@ export interface FileRouteTypes {
     | '/admin/jobs'
     | '/admin/offices'
     | '/admin/'
+    | '/admin/applications/$appId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -185,6 +196,7 @@ export interface FileRouteTypes {
     | '/admin/jobs'
     | '/admin/offices'
     | '/admin'
+    | '/admin/applications/$appId'
   id:
     | '__root__'
     | '/'
@@ -202,6 +214,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/jobs'
     | '/_authenticated/admin/offices'
     | '/_authenticated/admin/'
+    | '/_authenticated/admin/applications/$appId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -320,11 +333,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminApplicationsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/applications/$appId': {
+      id: '/_authenticated/admin/applications/$appId'
+      path: '/$appId'
+      fullPath: '/admin/applications/$appId'
+      preLoaderRoute: typeof AuthenticatedAdminApplicationsAppIdRouteImport
+      parentRoute: typeof AuthenticatedAdminApplicationsRoute
+    }
   }
 }
 
+interface AuthenticatedAdminApplicationsRouteChildren {
+  AuthenticatedAdminApplicationsAppIdRoute: typeof AuthenticatedAdminApplicationsAppIdRoute
+}
+
+const AuthenticatedAdminApplicationsRouteChildren: AuthenticatedAdminApplicationsRouteChildren =
+  {
+    AuthenticatedAdminApplicationsAppIdRoute:
+      AuthenticatedAdminApplicationsAppIdRoute,
+  }
+
+const AuthenticatedAdminApplicationsRouteWithChildren =
+  AuthenticatedAdminApplicationsRoute._addFileChildren(
+    AuthenticatedAdminApplicationsRouteChildren,
+  )
+
 interface AuthenticatedAdminRouteChildren {
-  AuthenticatedAdminApplicationsRoute: typeof AuthenticatedAdminApplicationsRoute
+  AuthenticatedAdminApplicationsRoute: typeof AuthenticatedAdminApplicationsRouteWithChildren
   AuthenticatedAdminDepartmentsRoute: typeof AuthenticatedAdminDepartmentsRoute
   AuthenticatedAdminJobsRoute: typeof AuthenticatedAdminJobsRoute
   AuthenticatedAdminOfficesRoute: typeof AuthenticatedAdminOfficesRoute
@@ -332,7 +367,8 @@ interface AuthenticatedAdminRouteChildren {
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
-  AuthenticatedAdminApplicationsRoute: AuthenticatedAdminApplicationsRoute,
+  AuthenticatedAdminApplicationsRoute:
+    AuthenticatedAdminApplicationsRouteWithChildren,
   AuthenticatedAdminDepartmentsRoute: AuthenticatedAdminDepartmentsRoute,
   AuthenticatedAdminJobsRoute: AuthenticatedAdminJobsRoute,
   AuthenticatedAdminOfficesRoute: AuthenticatedAdminOfficesRoute,
