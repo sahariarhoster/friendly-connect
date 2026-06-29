@@ -91,10 +91,26 @@ function ApplicationDetail() {
         .update({ admin_notes: JSON.stringify(next) })
         .eq("id", appId);
       if (error) throw error;
+      return next;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-application", appId] }),
-    onError: (e: Error) => toast.error(e.message),
+    onMutate: async (next) => {
+      await qc.cancelQueries({ queryKey: ["admin-application", appId] });
+      const prev = qc.getQueryData<AppRow | null>(["admin-application", appId]);
+      if (prev) {
+        qc.setQueryData(["admin-application", appId], {
+          ...prev,
+          admin_notes: JSON.stringify(next),
+        });
+      }
+      return { prev };
+    },
+    onError: (e: Error, _v, ctx) => {
+      if (ctx?.prev) qc.setQueryData(["admin-application", appId], ctx.prev);
+      toast.error(e.message);
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: ["admin-application", appId] }),
   });
+
 
   const addNote = async () => {
     const text = draft.trim();
