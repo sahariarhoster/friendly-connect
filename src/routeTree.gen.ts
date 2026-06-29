@@ -23,7 +23,7 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminOfficesRouteImport } from './routes/_authenticated/admin.offices'
 import { Route as AuthenticatedAdminJobsRouteImport } from './routes/_authenticated/admin.jobs'
 import { Route as AuthenticatedAdminDepartmentsRouteImport } from './routes/_authenticated/admin.departments'
-import { Route as AuthenticatedAdminApplicationsRouteImport } from './routes/_authenticated/admin.applications'
+import { Route as AuthenticatedAdminApplicationsIndexRouteImport } from './routes/_authenticated/admin.applications.index'
 import { Route as AuthenticatedAdminApplicationsAppIdRouteImport } from './routes/_authenticated/admin.applications.$appId'
 
 const AuthRoute = AuthRouteImport.update({
@@ -98,17 +98,17 @@ const AuthenticatedAdminDepartmentsRoute =
     path: '/departments',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
-const AuthenticatedAdminApplicationsRoute =
-  AuthenticatedAdminApplicationsRouteImport.update({
-    id: '/applications',
-    path: '/applications',
+const AuthenticatedAdminApplicationsIndexRoute =
+  AuthenticatedAdminApplicationsIndexRouteImport.update({
+    id: '/applications/',
+    path: '/applications/',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminApplicationsAppIdRoute =
   AuthenticatedAdminApplicationsAppIdRouteImport.update({
-    id: '/$appId',
-    path: '/$appId',
-    getParentRoute: () => AuthenticatedAdminApplicationsRoute,
+    id: '/applications/$appId',
+    path: '/applications/$appId',
+    getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -121,12 +121,12 @@ export interface FileRoutesByFullPath {
   '/apply/$jobId': typeof ApplyJobIdRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/jobs/': typeof JobsIndexRoute
-  '/admin/applications': typeof AuthenticatedAdminApplicationsRouteWithChildren
   '/admin/departments': typeof AuthenticatedAdminDepartmentsRoute
   '/admin/jobs': typeof AuthenticatedAdminJobsRoute
   '/admin/offices': typeof AuthenticatedAdminOfficesRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/admin/applications/$appId': typeof AuthenticatedAdminApplicationsAppIdRoute
+  '/admin/applications/': typeof AuthenticatedAdminApplicationsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -137,12 +137,12 @@ export interface FileRoutesByTo {
   '/apply/$jobId': typeof ApplyJobIdRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/jobs': typeof JobsIndexRoute
-  '/admin/applications': typeof AuthenticatedAdminApplicationsRouteWithChildren
   '/admin/departments': typeof AuthenticatedAdminDepartmentsRoute
   '/admin/jobs': typeof AuthenticatedAdminJobsRoute
   '/admin/offices': typeof AuthenticatedAdminOfficesRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/admin/applications/$appId': typeof AuthenticatedAdminApplicationsAppIdRoute
+  '/admin/applications': typeof AuthenticatedAdminApplicationsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -156,12 +156,12 @@ export interface FileRoutesById {
   '/apply/$jobId': typeof ApplyJobIdRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/jobs/': typeof JobsIndexRoute
-  '/_authenticated/admin/applications': typeof AuthenticatedAdminApplicationsRouteWithChildren
   '/_authenticated/admin/departments': typeof AuthenticatedAdminDepartmentsRoute
   '/_authenticated/admin/jobs': typeof AuthenticatedAdminJobsRoute
   '/_authenticated/admin/offices': typeof AuthenticatedAdminOfficesRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/admin/applications/$appId': typeof AuthenticatedAdminApplicationsAppIdRoute
+  '/_authenticated/admin/applications/': typeof AuthenticatedAdminApplicationsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -175,12 +175,12 @@ export interface FileRouteTypes {
     | '/apply/$jobId'
     | '/jobs/$jobId'
     | '/jobs/'
-    | '/admin/applications'
     | '/admin/departments'
     | '/admin/jobs'
     | '/admin/offices'
     | '/admin/'
     | '/admin/applications/$appId'
+    | '/admin/applications/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -191,12 +191,12 @@ export interface FileRouteTypes {
     | '/apply/$jobId'
     | '/jobs/$jobId'
     | '/jobs'
-    | '/admin/applications'
     | '/admin/departments'
     | '/admin/jobs'
     | '/admin/offices'
     | '/admin'
     | '/admin/applications/$appId'
+    | '/admin/applications'
   id:
     | '__root__'
     | '/'
@@ -209,12 +209,12 @@ export interface FileRouteTypes {
     | '/apply/$jobId'
     | '/jobs/$jobId'
     | '/jobs/'
-    | '/_authenticated/admin/applications'
     | '/_authenticated/admin/departments'
     | '/_authenticated/admin/jobs'
     | '/_authenticated/admin/offices'
     | '/_authenticated/admin/'
     | '/_authenticated/admin/applications/$appId'
+    | '/_authenticated/admin/applications/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -326,53 +326,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminDepartmentsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
-    '/_authenticated/admin/applications': {
-      id: '/_authenticated/admin/applications'
+    '/_authenticated/admin/applications/': {
+      id: '/_authenticated/admin/applications/'
       path: '/applications'
-      fullPath: '/admin/applications'
-      preLoaderRoute: typeof AuthenticatedAdminApplicationsRouteImport
+      fullPath: '/admin/applications/'
+      preLoaderRoute: typeof AuthenticatedAdminApplicationsIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/applications/$appId': {
       id: '/_authenticated/admin/applications/$appId'
-      path: '/$appId'
+      path: '/applications/$appId'
       fullPath: '/admin/applications/$appId'
       preLoaderRoute: typeof AuthenticatedAdminApplicationsAppIdRouteImport
-      parentRoute: typeof AuthenticatedAdminApplicationsRoute
+      parentRoute: typeof AuthenticatedAdminRoute
     }
   }
 }
 
-interface AuthenticatedAdminApplicationsRouteChildren {
-  AuthenticatedAdminApplicationsAppIdRoute: typeof AuthenticatedAdminApplicationsAppIdRoute
-}
-
-const AuthenticatedAdminApplicationsRouteChildren: AuthenticatedAdminApplicationsRouteChildren =
-  {
-    AuthenticatedAdminApplicationsAppIdRoute:
-      AuthenticatedAdminApplicationsAppIdRoute,
-  }
-
-const AuthenticatedAdminApplicationsRouteWithChildren =
-  AuthenticatedAdminApplicationsRoute._addFileChildren(
-    AuthenticatedAdminApplicationsRouteChildren,
-  )
-
 interface AuthenticatedAdminRouteChildren {
-  AuthenticatedAdminApplicationsRoute: typeof AuthenticatedAdminApplicationsRouteWithChildren
   AuthenticatedAdminDepartmentsRoute: typeof AuthenticatedAdminDepartmentsRoute
   AuthenticatedAdminJobsRoute: typeof AuthenticatedAdminJobsRoute
   AuthenticatedAdminOfficesRoute: typeof AuthenticatedAdminOfficesRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedAdminApplicationsAppIdRoute: typeof AuthenticatedAdminApplicationsAppIdRoute
+  AuthenticatedAdminApplicationsIndexRoute: typeof AuthenticatedAdminApplicationsIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
-  AuthenticatedAdminApplicationsRoute:
-    AuthenticatedAdminApplicationsRouteWithChildren,
   AuthenticatedAdminDepartmentsRoute: AuthenticatedAdminDepartmentsRoute,
   AuthenticatedAdminJobsRoute: AuthenticatedAdminJobsRoute,
   AuthenticatedAdminOfficesRoute: AuthenticatedAdminOfficesRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  AuthenticatedAdminApplicationsAppIdRoute:
+    AuthenticatedAdminApplicationsAppIdRoute,
+  AuthenticatedAdminApplicationsIndexRoute:
+    AuthenticatedAdminApplicationsIndexRoute,
 }
 
 const AuthenticatedAdminRouteWithChildren =
@@ -406,13 +394,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
