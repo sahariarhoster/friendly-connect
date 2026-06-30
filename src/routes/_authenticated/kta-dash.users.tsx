@@ -169,6 +169,11 @@ function AdminUsers() {
         <CardContent className="p-0">
           {isLoading ? (
             <p className="p-6 text-muted-foreground">Loading…</p>
+          ) : error ? (
+            <div className="p-6 space-y-2">
+              <p className="font-medium text-destructive">Failed to load users</p>
+              <p className="text-sm text-muted-foreground break-all">{(error as Error).message}</p>
+            </div>
           ) : rows.length === 0 ? (
             <EmptyState icon={UsersIcon} title="No users yet" description="Create your first user above." />
           ) : (
