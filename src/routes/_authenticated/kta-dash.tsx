@@ -29,7 +29,9 @@ function AdminLayout() {
     { to: "/kta-dash/applications", label: "Applications", icon: Inbox },
     { to: "/kta-dash/departments", label: "Departments", icon: Building2 },
     { to: "/kta-dash/offices", label: "Offices", icon: MapPin },
+    { to: "/kta-dash/users", label: "Users", icon: UsersIcon },
   ];
+
 
   return (
     <div>
