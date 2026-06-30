@@ -9,7 +9,7 @@ import { APPLICATION_STATUSES, STATUS_LABELS } from "@/lib/positions";
 import { ArrowLeft, Mail, Phone, FileText, ExternalLink, UserCircle2, NotebookPen, Trash2, Plus } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_authenticated/admin/applications/$appId")({
+export const Route = createFileRoute("/_authenticated/kta-dash/applications/$appId")({
   component: ApplicationDetail,
 });
 
@@ -137,7 +137,7 @@ function ApplicationDetail() {
     return (
       <main className="mx-auto max-w-6xl px-6 py-16 text-center">
         <h1 className="text-2xl font-bold">Application not found</h1>
-        <Link to="/admin/applications"><Button className="mt-4">Back to applications</Button></Link>
+        <Link to="/kta-dash/applications"><Button className="mt-4">Back to applications</Button></Link>
       </main>
     );
   }
@@ -152,7 +152,7 @@ function ApplicationDetail() {
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 pb-2">
           <div>
             <Link
-              to="/admin/applications"
+              to="/kta-dash/applications"
               className="group mb-4 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-primary"
             >
               <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />

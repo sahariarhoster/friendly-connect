@@ -8,7 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent } from "@/components/ui/card";
+
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -21,7 +23,7 @@ import { Plus, Pencil, Trash2, Link2, Briefcase, ListChecks, FileText } from "lu
 import { PageHeader, EmptyState } from "@/components/PageHeader";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_authenticated/admin/jobs")({
+export const Route = createFileRoute("/_authenticated/kta-dash/jobs")({
   component: AdminJobs,
 });
 
@@ -57,6 +59,8 @@ function AdminJobs() {
   const qc = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Partial<JobRow> | null>(null);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+
 
   const { data: jobs, isLoading } = useQuery({
     queryKey: ["admin-jobs"],
@@ -104,17 +108,19 @@ function AdminJobs() {
   });
 
   const del = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("jobs").delete().eq("id", id);
+    mutationFn: async (ids: string[]) => {
+      const { error } = await supabase.from("jobs").delete().in("id", ids);
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: (_d, ids) => {
       qc.invalidateQueries({ queryKey: ["admin-jobs"] });
       qc.invalidateQueries({ queryKey: ["public-jobs"] });
-      toast.success("Job deleted");
+      setSelected(new Set());
+      toast.success(`Deleted ${ids.length} job(s)`);
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
 
   function openNew() { setEditing(emptyJob()); setDialogOpen(true); }
   function openEdit(j: JobRow) {
@@ -162,66 +168,104 @@ function AdminJobs() {
               action={<Button onClick={openNew} className="gap-2"><Plus className="h-4 w-4" /> New job</Button>}
             />
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-muted/40 hover:bg-muted/40">
-                  <TableHead>Title</TableHead>
-                  <TableHead>Position</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Deadline</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {jobs!.map((j) => (
-                  <TableRow key={j.id} className="hover:bg-muted/30">
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-soft text-primary">
-                          <Briefcase className="h-4 w-4" />
-                        </div>
-                        <div className="min-w-0">
-                          <div className="font-medium">{j.title}</div>
-                          <div className="text-xs text-muted-foreground">{j.department}{j.location ? ` • ${j.location}` : ""}</div>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="font-medium">{POSITION_LABELS[j.position_type as PositionType]}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={j.status === "open" ? "default" : j.status === "closed" ? "destructive" : "secondary"} className="capitalize">
-                        {j.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{j.deadline ? new Date(j.deadline).toLocaleDateString() : "—"}</TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        title="Copy apply link"
-                        onClick={async () => {
-                          const url = `${window.location.origin}/apply/${j.id}`;
-                          try {
-                            await navigator.clipboard.writeText(url);
-                            toast.success("Apply link copied", { description: url });
-                          } catch {
-                            toast.error("Could not copy link");
-                          }
-                        }}
-                      >
-                        <Link2 className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => openEdit(j)}><Pencil className="h-4 w-4" /></Button>
-                      <Button variant="ghost" size="icon" onClick={() => { if (confirm("Delete this job?")) del.mutate(j.id); }}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
+            <>
+              {selected.size > 0 && (
+                <div className="flex items-center justify-between gap-3 border-b border-border bg-muted/30 px-4 py-2">
+                  <div className="text-sm">{selected.size} selected</div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={() => setSelected(new Set())}>Clear</Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      disabled={del.isPending}
+                      onClick={() => {
+                        if (confirm(`Delete ${selected.size} job(s)?`)) del.mutate(Array.from(selected));
+                      }}
+                    >
+                      <Trash2 className="mr-1 h-4 w-4" /> Delete selected
+                    </Button>
+                  </div>
+                </div>
+              )}
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/40 hover:bg-muted/40">
+                    <TableHead className="w-10">
+                      <Checkbox
+                        checked={jobs!.length > 0 && jobs!.every((j) => selected.has(j.id))}
+                        onCheckedChange={(v) => setSelected(v ? new Set(jobs!.map((j) => j.id)) : new Set())}
+                      />
+                    </TableHead>
+                    <TableHead>Title</TableHead>
+                    <TableHead>Position</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Deadline</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {jobs!.map((j) => (
+                    <TableRow key={j.id} className="hover:bg-muted/30">
+                      <TableCell>
+                        <Checkbox
+                          checked={selected.has(j.id)}
+                          onCheckedChange={() => {
+                            const next = new Set(selected);
+                            if (next.has(j.id)) next.delete(j.id);
+                            else next.add(j.id);
+                            setSelected(next);
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-soft text-primary">
+                            <Briefcase className="h-4 w-4" />
+                          </div>
+                          <div className="min-w-0">
+                            <div className="font-medium">{j.title}</div>
+                            <div className="text-xs text-muted-foreground">{j.department}{j.location ? ` • ${j.location}` : ""}</div>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="font-medium">{POSITION_LABELS[j.position_type as PositionType]}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={j.status === "open" ? "default" : j.status === "closed" ? "destructive" : "secondary"} className="capitalize">
+                          {j.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{j.deadline ? new Date(j.deadline).toLocaleDateString() : "—"}</TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title="Copy apply link"
+                          onClick={async () => {
+                            const url = `${window.location.origin}/apply/${j.id}`;
+                            try {
+                              await navigator.clipboard.writeText(url);
+                              toast.success("Apply link copied", { description: url });
+                            } catch {
+                              toast.error("Could not copy link");
+                            }
+                          }}
+                        >
+                          <Link2 className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => openEdit(j)}><Pencil className="h-4 w-4" /></Button>
+                        <Button variant="ghost" size="icon" onClick={() => { if (confirm("Delete this job?")) del.mutate([j.id]); }}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </>
           )}
+
         </CardContent>
       </Card>
 

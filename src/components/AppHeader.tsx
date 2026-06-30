@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { LogOut } from "lucide-react";
-import logo from "@/assets/khatiana-logo.png.asset.json";
+const logo = { url: "/khatiana-logo.png" };
 import { useRoles } from "@/hooks/useRoles";
 
 export function AppHeader() {
@@ -63,7 +63,7 @@ export function AppHeader() {
                 </Link>
               )}
               {isAdmin && (
-                <Link to="/admin/jobs" activeProps={{ className: "bg-primary/10 text-primary" }} className="rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+                <Link to="/kta-dash/jobs" activeProps={{ className: "bg-primary/10 text-primary" }} className="rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
                   Admin
                 </Link>
               )}

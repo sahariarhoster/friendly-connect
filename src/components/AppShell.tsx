@@ -6,7 +6,7 @@ import { useRoles } from "@/hooks/useRoles";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import logo from "@/assets/khatiana-logo.png.asset.json";
+const logo = { url: "/khatiana-logo.png" };
 import {
   LayoutDashboard,
   Briefcase,
@@ -19,7 +19,9 @@ import {
   Home,
   LogIn,
   Sparkles,
+  Users as UsersIcon,
 } from "lucide-react";
+
 
 type NavItem = {
   to: string;
@@ -117,12 +119,14 @@ export function AppShell({ children }: { children: ReactNode }) {
           {
             label: "Recruitment",
             items: [
-              { to: "/admin/jobs", label: "Job Posts", icon: Briefcase },
-              { to: "/admin/applications", label: "Applications", icon: FileText, badgeKey: "pendingApps" },
-              { to: "/admin/departments", label: "Departments", icon: Building2 },
-              { to: "/admin/offices", label: "Offices", icon: MapPin },
+              { to: "/kta-dash/jobs", label: "Job Posts", icon: Briefcase },
+              { to: "/kta-dash/applications", label: "Applications", icon: FileText, badgeKey: "pendingApps" },
+              { to: "/kta-dash/departments", label: "Departments", icon: Building2 },
+              { to: "/kta-dash/offices", label: "Offices", icon: MapPin },
+              { to: "/kta-dash/users", label: "Users", icon: UsersIcon },
             ],
           },
+
           {
             label: "Settings",
             items: [{ to: "/profile", label: "Profile", icon: UserIcon }],

@@ -14,7 +14,7 @@ import { Plus, Trash2, Building2, ListChecks } from "lucide-react";
 import { PageHeader, EmptyState } from "@/components/PageHeader";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_authenticated/admin/departments")({
+export const Route = createFileRoute("/_authenticated/kta-dash/departments")({
   component: AdminDepartments,
 });
 

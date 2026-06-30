@@ -2,10 +2,10 @@ import { createFileRoute, Outlet, useNavigate, Link, useRouterState } from "@tan
 import { useEffect } from "react";
 
 import { useRoles } from "@/hooks/useRoles";
-import { Briefcase, Inbox, Building2, MapPin } from "lucide-react";
+import { Briefcase, Inbox, Building2, MapPin, Users as UsersIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_authenticated/admin")({
+export const Route = createFileRoute("/_authenticated/kta-dash")({
   component: AdminLayout,
 });
 
@@ -25,11 +25,13 @@ function AdminLayout() {
   if (!roles?.includes("admin")) return null;
 
   const tabs = [
-    { to: "/admin/jobs", label: "Job posts", icon: Briefcase },
-    { to: "/admin/applications", label: "Applications", icon: Inbox },
-    { to: "/admin/departments", label: "Departments", icon: Building2 },
-    { to: "/admin/offices", label: "Offices", icon: MapPin },
+    { to: "/kta-dash/jobs", label: "Job posts", icon: Briefcase },
+    { to: "/kta-dash/applications", label: "Applications", icon: Inbox },
+    { to: "/kta-dash/departments", label: "Departments", icon: Building2 },
+    { to: "/kta-dash/offices", label: "Offices", icon: MapPin },
+    { to: "/kta-dash/users", label: "Users", icon: UsersIcon },
   ];
+
 
   return (
     <div>
