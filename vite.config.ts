@@ -14,6 +14,11 @@ export default defineConfig({
   },
   nitro: {
     preset: "node-server",
-    noExternals: true,
-  } as { preset: string; noExternals: boolean },
+    // cPanel's Node environment breaks Nitro's file tracer when it sees `tslib`.
+    // Keep dependencies external for proper CommonJS interop, but exclude `tslib`
+    // from Nitro's traced dependency list. The app does not need a separate traced
+    // tslib copy when dependencies are installed in the cPanel app directory.
+    exportConditions: ["module"],
+    traceDeps: ["!tslib"],
+  } as { preset: string; exportConditions: string[]; traceDeps: string[] },
 });
