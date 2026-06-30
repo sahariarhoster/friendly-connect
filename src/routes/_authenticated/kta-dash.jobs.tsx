@@ -168,66 +168,104 @@ function AdminJobs() {
               action={<Button onClick={openNew} className="gap-2"><Plus className="h-4 w-4" /> New job</Button>}
             />
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-muted/40 hover:bg-muted/40">
-                  <TableHead>Title</TableHead>
-                  <TableHead>Position</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Deadline</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {jobs!.map((j) => (
-                  <TableRow key={j.id} className="hover:bg-muted/30">
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-soft text-primary">
-                          <Briefcase className="h-4 w-4" />
-                        </div>
-                        <div className="min-w-0">
-                          <div className="font-medium">{j.title}</div>
-                          <div className="text-xs text-muted-foreground">{j.department}{j.location ? ` • ${j.location}` : ""}</div>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="font-medium">{POSITION_LABELS[j.position_type as PositionType]}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={j.status === "open" ? "default" : j.status === "closed" ? "destructive" : "secondary"} className="capitalize">
-                        {j.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{j.deadline ? new Date(j.deadline).toLocaleDateString() : "—"}</TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        title="Copy apply link"
-                        onClick={async () => {
-                          const url = `${window.location.origin}/apply/${j.id}`;
-                          try {
-                            await navigator.clipboard.writeText(url);
-                            toast.success("Apply link copied", { description: url });
-                          } catch {
-                            toast.error("Could not copy link");
-                          }
-                        }}
-                      >
-                        <Link2 className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => openEdit(j)}><Pencil className="h-4 w-4" /></Button>
-                      <Button variant="ghost" size="icon" onClick={() => { if (confirm("Delete this job?")) del.mutate(j.id); }}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
+            <>
+              {selected.size > 0 && (
+                <div className="flex items-center justify-between gap-3 border-b border-border bg-muted/30 px-4 py-2">
+                  <div className="text-sm">{selected.size} selected</div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={() => setSelected(new Set())}>Clear</Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      disabled={del.isPending}
+                      onClick={() => {
+                        if (confirm(`Delete ${selected.size} job(s)?`)) del.mutate(Array.from(selected));
+                      }}
+                    >
+                      <Trash2 className="mr-1 h-4 w-4" /> Delete selected
+                    </Button>
+                  </div>
+                </div>
+              )}
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/40 hover:bg-muted/40">
+                    <TableHead className="w-10">
+                      <Checkbox
+                        checked={jobs!.length > 0 && jobs!.every((j) => selected.has(j.id))}
+                        onCheckedChange={(v) => setSelected(v ? new Set(jobs!.map((j) => j.id)) : new Set())}
+                      />
+                    </TableHead>
+                    <TableHead>Title</TableHead>
+                    <TableHead>Position</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Deadline</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {jobs!.map((j) => (
+                    <TableRow key={j.id} className="hover:bg-muted/30">
+                      <TableCell>
+                        <Checkbox
+                          checked={selected.has(j.id)}
+                          onCheckedChange={() => {
+                            const next = new Set(selected);
+                            if (next.has(j.id)) next.delete(j.id);
+                            else next.add(j.id);
+                            setSelected(next);
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-soft text-primary">
+                            <Briefcase className="h-4 w-4" />
+                          </div>
+                          <div className="min-w-0">
+                            <div className="font-medium">{j.title}</div>
+                            <div className="text-xs text-muted-foreground">{j.department}{j.location ? ` • ${j.location}` : ""}</div>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="font-medium">{POSITION_LABELS[j.position_type as PositionType]}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={j.status === "open" ? "default" : j.status === "closed" ? "destructive" : "secondary"} className="capitalize">
+                          {j.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{j.deadline ? new Date(j.deadline).toLocaleDateString() : "—"}</TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title="Copy apply link"
+                          onClick={async () => {
+                            const url = `${window.location.origin}/apply/${j.id}`;
+                            try {
+                              await navigator.clipboard.writeText(url);
+                              toast.success("Apply link copied", { description: url });
+                            } catch {
+                              toast.error("Could not copy link");
+                            }
+                          }}
+                        >
+                          <Link2 className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => openEdit(j)}><Pencil className="h-4 w-4" /></Button>
+                        <Button variant="ghost" size="icon" onClick={() => { if (confirm("Delete this job?")) del.mutate([j.id]); }}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </>
           )}
+
         </CardContent>
       </Card>
 
