@@ -15,7 +15,7 @@ import {
   Lock,
   CheckCircle2,
 } from "lucide-react";
-import logo from "@/assets/khatiana-logo.png.asset.json";
+const logo = { url: "/khatiana-logo.png" };
 
 export const Route = createFileRoute("/")({
   head: () => ({

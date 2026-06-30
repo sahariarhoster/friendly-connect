@@ -6,7 +6,7 @@ import { useRoles } from "@/hooks/useRoles";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import logo from "@/assets/khatiana-logo.png.asset.json";
+const logo = { url: "/khatiana-logo.png" };
 import {
   LayoutDashboard,
   Briefcase,

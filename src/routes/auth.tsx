@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import logo from "@/assets/khatiana-logo.png.asset.json";
+const logo = { url: "/khatiana-logo.png" };
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
