@@ -20,6 +20,7 @@ import { Route as AuthenticatedKtaDashRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedApplicationsRouteImport } from './routes/_authenticated/applications'
 import { Route as AuthenticatedKtaDashIndexRouteImport } from './routes/_authenticated/kta-dash.index'
+import { Route as AuthenticatedKtaDashUsersRouteImport } from './routes/_authenticated/kta-dash.users'
 import { Route as AuthenticatedKtaDashOfficesRouteImport } from './routes/_authenticated/kta-dash.offices'
 import { Route as AuthenticatedKtaDashJobsRouteImport } from './routes/_authenticated/kta-dash.jobs'
 import { Route as AuthenticatedKtaDashDepartmentsRouteImport } from './routes/_authenticated/kta-dash.departments'
@@ -82,6 +83,12 @@ const AuthenticatedKtaDashIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedKtaDashRoute,
   } as any)
+const AuthenticatedKtaDashUsersRoute =
+  AuthenticatedKtaDashUsersRouteImport.update({
+    id: '/users',
+    path: '/users',
+    getParentRoute: () => AuthenticatedKtaDashRoute,
+  } as any)
 const AuthenticatedKtaDashOfficesRoute =
   AuthenticatedKtaDashOfficesRouteImport.update({
     id: '/offices',
@@ -126,6 +133,7 @@ export interface FileRoutesByFullPath {
   '/kta-dash/departments': typeof AuthenticatedKtaDashDepartmentsRoute
   '/kta-dash/jobs': typeof AuthenticatedKtaDashJobsRoute
   '/kta-dash/offices': typeof AuthenticatedKtaDashOfficesRoute
+  '/kta-dash/users': typeof AuthenticatedKtaDashUsersRoute
   '/kta-dash/': typeof AuthenticatedKtaDashIndexRoute
   '/kta-dash/applications/$appId': typeof AuthenticatedKtaDashApplicationsAppIdRoute
   '/kta-dash/applications/': typeof AuthenticatedKtaDashApplicationsIndexRoute
@@ -142,6 +150,7 @@ export interface FileRoutesByTo {
   '/kta-dash/departments': typeof AuthenticatedKtaDashDepartmentsRoute
   '/kta-dash/jobs': typeof AuthenticatedKtaDashJobsRoute
   '/kta-dash/offices': typeof AuthenticatedKtaDashOfficesRoute
+  '/kta-dash/users': typeof AuthenticatedKtaDashUsersRoute
   '/kta-dash': typeof AuthenticatedKtaDashIndexRoute
   '/kta-dash/applications/$appId': typeof AuthenticatedKtaDashApplicationsAppIdRoute
   '/kta-dash/applications': typeof AuthenticatedKtaDashApplicationsIndexRoute
@@ -161,6 +170,7 @@ export interface FileRoutesById {
   '/_authenticated/kta-dash/departments': typeof AuthenticatedKtaDashDepartmentsRoute
   '/_authenticated/kta-dash/jobs': typeof AuthenticatedKtaDashJobsRoute
   '/_authenticated/kta-dash/offices': typeof AuthenticatedKtaDashOfficesRoute
+  '/_authenticated/kta-dash/users': typeof AuthenticatedKtaDashUsersRoute
   '/_authenticated/kta-dash/': typeof AuthenticatedKtaDashIndexRoute
   '/_authenticated/kta-dash/applications/$appId': typeof AuthenticatedKtaDashApplicationsAppIdRoute
   '/_authenticated/kta-dash/applications/': typeof AuthenticatedKtaDashApplicationsIndexRoute
@@ -180,6 +190,7 @@ export interface FileRouteTypes {
     | '/kta-dash/departments'
     | '/kta-dash/jobs'
     | '/kta-dash/offices'
+    | '/kta-dash/users'
     | '/kta-dash/'
     | '/kta-dash/applications/$appId'
     | '/kta-dash/applications/'
@@ -196,6 +207,7 @@ export interface FileRouteTypes {
     | '/kta-dash/departments'
     | '/kta-dash/jobs'
     | '/kta-dash/offices'
+    | '/kta-dash/users'
     | '/kta-dash'
     | '/kta-dash/applications/$appId'
     | '/kta-dash/applications'
@@ -214,6 +226,7 @@ export interface FileRouteTypes {
     | '/_authenticated/kta-dash/departments'
     | '/_authenticated/kta-dash/jobs'
     | '/_authenticated/kta-dash/offices'
+    | '/_authenticated/kta-dash/users'
     | '/_authenticated/kta-dash/'
     | '/_authenticated/kta-dash/applications/$appId'
     | '/_authenticated/kta-dash/applications/'
@@ -307,6 +320,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedKtaDashIndexRouteImport
       parentRoute: typeof AuthenticatedKtaDashRoute
     }
+    '/_authenticated/kta-dash/users': {
+      id: '/_authenticated/kta-dash/users'
+      path: '/users'
+      fullPath: '/kta-dash/users'
+      preLoaderRoute: typeof AuthenticatedKtaDashUsersRouteImport
+      parentRoute: typeof AuthenticatedKtaDashRoute
+    }
     '/_authenticated/kta-dash/offices': {
       id: '/_authenticated/kta-dash/offices'
       path: '/offices'
@@ -349,6 +369,7 @@ interface AuthenticatedKtaDashRouteChildren {
   AuthenticatedKtaDashDepartmentsRoute: typeof AuthenticatedKtaDashDepartmentsRoute
   AuthenticatedKtaDashJobsRoute: typeof AuthenticatedKtaDashJobsRoute
   AuthenticatedKtaDashOfficesRoute: typeof AuthenticatedKtaDashOfficesRoute
+  AuthenticatedKtaDashUsersRoute: typeof AuthenticatedKtaDashUsersRoute
   AuthenticatedKtaDashIndexRoute: typeof AuthenticatedKtaDashIndexRoute
   AuthenticatedKtaDashApplicationsAppIdRoute: typeof AuthenticatedKtaDashApplicationsAppIdRoute
   AuthenticatedKtaDashApplicationsIndexRoute: typeof AuthenticatedKtaDashApplicationsIndexRoute
@@ -358,6 +379,7 @@ const AuthenticatedKtaDashRouteChildren: AuthenticatedKtaDashRouteChildren = {
   AuthenticatedKtaDashDepartmentsRoute: AuthenticatedKtaDashDepartmentsRoute,
   AuthenticatedKtaDashJobsRoute: AuthenticatedKtaDashJobsRoute,
   AuthenticatedKtaDashOfficesRoute: AuthenticatedKtaDashOfficesRoute,
+  AuthenticatedKtaDashUsersRoute: AuthenticatedKtaDashUsersRoute,
   AuthenticatedKtaDashIndexRoute: AuthenticatedKtaDashIndexRoute,
   AuthenticatedKtaDashApplicationsAppIdRoute:
     AuthenticatedKtaDashApplicationsAppIdRoute,
