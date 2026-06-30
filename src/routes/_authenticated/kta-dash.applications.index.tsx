@@ -143,50 +143,94 @@ function AdminApplications() {
           ) : filtered.length === 0 ? (
             <EmptyState icon={Inbox} title="No applications match" description="Try clearing the filters above." />
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-muted/40 hover:bg-muted/40">
-                  <TableHead>Applicant</TableHead>
-                  <TableHead>Job</TableHead>
-                  <TableHead>Submitted</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Details</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filtered.map((a) => (
-                  <TableRow key={a.id} className="hover:bg-muted/30">
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground font-semibold">
-                          {a.full_name.charAt(0).toUpperCase()}
-                        </div>
-                        <div className="min-w-0">
-                          <div className="font-medium">{a.full_name}</div>
-                          <div className="text-xs text-muted-foreground">{a.email}</div>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-sm">{a.jobs?.title ?? "—"}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{new Date(a.created_at).toLocaleDateString()}</TableCell>
-                    <TableCell>
-                      <Select value={a.status} onValueChange={(v) => updateStatus.mutate({ id: a.id, status: v })}>
-                        <SelectTrigger className="h-8 w-36"><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          {APPLICATION_STATUSES.map((s) => <SelectItem key={s} value={s}>{STATUS_LABELS[s]}</SelectItem>)}
-                        </SelectContent>
-                      </Select>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button asChild variant="outline" size="sm">
-                        <Link to="/kta-dash/applications/$appId" params={{ appId: a.id }}>View</Link>
-                      </Button>
-                    </TableCell>
+            <>
+              {selected.size > 0 && (
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-muted/30 px-4 py-2">
+                  <div className="text-sm">{selected.size} selected</div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Select onValueChange={(v) => bulkUpdate.mutate({ ids: Array.from(selected), status: v })}>
+                      <SelectTrigger className="h-8 w-48"><SelectValue placeholder="Set status…" /></SelectTrigger>
+                      <SelectContent>
+                        {APPLICATION_STATUSES.map((s) => <SelectItem key={s} value={s}>{STATUS_LABELS[s]}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                    <Button variant="outline" size="sm" onClick={() => setSelected(new Set())}>Clear</Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      disabled={bulkDelete.isPending}
+                      onClick={() => {
+                        if (confirm(`Delete ${selected.size} application(s)?`)) bulkDelete.mutate(Array.from(selected));
+                      }}
+                    >
+                      <Trash2 className="mr-1 h-4 w-4" /> Delete
+                    </Button>
+                  </div>
+                </div>
+              )}
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/40 hover:bg-muted/40">
+                    <TableHead className="w-10">
+                      <Checkbox
+                        checked={filtered.length > 0 && filtered.every((a) => selected.has(a.id))}
+                        onCheckedChange={(v) => setSelected(v ? new Set(filtered.map((a) => a.id)) : new Set())}
+                      />
+                    </TableHead>
+                    <TableHead>Applicant</TableHead>
+                    <TableHead>Job</TableHead>
+                    <TableHead>Submitted</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Details</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {filtered.map((a) => (
+                    <TableRow key={a.id} className="hover:bg-muted/30">
+                      <TableCell>
+                        <Checkbox
+                          checked={selected.has(a.id)}
+                          onCheckedChange={() => {
+                            const next = new Set(selected);
+                            if (next.has(a.id)) next.delete(a.id);
+                            else next.add(a.id);
+                            setSelected(next);
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground font-semibold">
+                            {a.full_name.charAt(0).toUpperCase()}
+                          </div>
+                          <div className="min-w-0">
+                            <div className="font-medium">{a.full_name}</div>
+                            <div className="text-xs text-muted-foreground">{a.email}</div>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-sm">{a.jobs?.title ?? "—"}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{new Date(a.created_at).toLocaleDateString()}</TableCell>
+                      <TableCell>
+                        <Select value={a.status} onValueChange={(v) => updateStatus.mutate({ id: a.id, status: v })}>
+                          <SelectTrigger className="h-8 w-36"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            {APPLICATION_STATUSES.map((s) => <SelectItem key={s} value={s}>{STATUS_LABELS[s]}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button asChild variant="outline" size="sm">
+                          <Link to="/kta-dash/applications/$appId" params={{ appId: a.id }}>View</Link>
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </>
           )}
+
         </CardContent>
       </Card>
     </main>
