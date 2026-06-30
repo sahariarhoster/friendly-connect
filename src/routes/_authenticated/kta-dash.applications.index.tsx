@@ -146,7 +146,7 @@ function AdminApplications() {
                     </TableCell>
                     <TableCell className="text-right">
                       <Button asChild variant="outline" size="sm">
-                        <Link to="/admin/applications/$appId" params={{ appId: a.id }}>View</Link>
+                        <Link to="/kta-dash/applications/$appId" params={{ appId: a.id }}>View</Link>
                       </Button>
                     </TableCell>
                   </TableRow>

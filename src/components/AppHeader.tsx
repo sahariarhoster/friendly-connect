@@ -63,7 +63,7 @@ export function AppHeader() {
                 </Link>
               )}
               {isAdmin && (
-                <Link to="/admin/jobs" activeProps={{ className: "bg-primary/10 text-primary" }} className="rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+                <Link to="/kta-dash/jobs" activeProps={{ className: "bg-primary/10 text-primary" }} className="rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
                   Admin
                 </Link>
               )}

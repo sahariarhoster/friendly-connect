@@ -25,10 +25,10 @@ function AdminLayout() {
   if (!roles?.includes("admin")) return null;
 
   const tabs = [
-    { to: "/admin/jobs", label: "Job posts", icon: Briefcase },
-    { to: "/admin/applications", label: "Applications", icon: Inbox },
-    { to: "/admin/departments", label: "Departments", icon: Building2 },
-    { to: "/admin/offices", label: "Offices", icon: MapPin },
+    { to: "/kta-dash/jobs", label: "Job posts", icon: Briefcase },
+    { to: "/kta-dash/applications", label: "Applications", icon: Inbox },
+    { to: "/kta-dash/departments", label: "Departments", icon: Building2 },
+    { to: "/kta-dash/offices", label: "Offices", icon: MapPin },
   ];
 
   return (

@@ -117,10 +117,10 @@ export function AppShell({ children }: { children: ReactNode }) {
           {
             label: "Recruitment",
             items: [
-              { to: "/admin/jobs", label: "Job Posts", icon: Briefcase },
-              { to: "/admin/applications", label: "Applications", icon: FileText, badgeKey: "pendingApps" },
-              { to: "/admin/departments", label: "Departments", icon: Building2 },
-              { to: "/admin/offices", label: "Offices", icon: MapPin },
+              { to: "/kta-dash/jobs", label: "Job Posts", icon: Briefcase },
+              { to: "/kta-dash/applications", label: "Applications", icon: FileText, badgeKey: "pendingApps" },
+              { to: "/kta-dash/departments", label: "Departments", icon: Building2 },
+              { to: "/kta-dash/offices", label: "Offices", icon: MapPin },
             ],
           },
           {

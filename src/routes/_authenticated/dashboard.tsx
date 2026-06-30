@@ -298,7 +298,7 @@ function AdminView({
           <CardContent className="p-6">
             <div className="mb-4 flex items-center justify-between">
               <SectionTitle icon={Users} title="Recent applications" subtitle="Latest 5 submissions" compact />
-              <Link to="/admin/applications" className="text-xs font-medium text-primary hover:underline">
+              <Link to="/kta-dash/applications" className="text-xs font-medium text-primary hover:underline">
                 View all →
               </Link>
             </div>
@@ -307,7 +307,7 @@ function AdminView({
                 {recentApps.map((a) => (
                   <li key={a.id}>
                     <Link
-                      to="/admin/applications/$appId"
+                      to="/kta-dash/applications/$appId"
                       params={{ appId: a.id }}
                       className="flex items-center gap-3 py-3 transition hover:bg-muted/40 -mx-2 px-2 rounded-lg"
                     >
@@ -334,7 +334,7 @@ function AdminView({
           <CardContent className="p-6">
             <div className="mb-4 flex items-center justify-between">
               <SectionTitle icon={Briefcase} title="Top jobs" subtitle="By applications" compact />
-              <Link to="/admin/jobs" className="text-xs font-medium text-primary hover:underline">
+              <Link to="/kta-dash/jobs" className="text-xs font-medium text-primary hover:underline">
                 Manage →
               </Link>
             </div>
@@ -369,9 +369,9 @@ function AdminView({
 
       <h2 className="mt-10 mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">Quick actions</h2>
       <div className="grid gap-4 md:grid-cols-3">
-        <ActionTile to="/admin/jobs" icon={Briefcase} title="Manage jobs" desc="Create, edit, publish, or close vacancies." />
-        <ActionTile to="/admin/applications" icon={Users} title="Review applicants" desc="Move candidates through the pipeline." />
-        <ActionTile to="/admin/departments" icon={Building2} title="Departments" desc="Customize forms by department." />
+        <ActionTile to="/kta-dash/jobs" icon={Briefcase} title="Manage jobs" desc="Create, edit, publish, or close vacancies." />
+        <ActionTile to="/kta-dash/applications" icon={Users} title="Review applicants" desc="Move candidates through the pipeline." />
+        <ActionTile to="/kta-dash/departments" icon={Building2} title="Departments" desc="Customize forms by department." />
       </div>
     </>
   );
