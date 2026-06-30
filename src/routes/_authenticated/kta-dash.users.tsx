@@ -43,9 +43,10 @@ function AdminUsers() {
   const [newPass, setNewPass] = useState("");
   const [form, setForm] = useState({ email: "", password: "", full_name: "", role: "applicant" as "admin" | "applicant" });
 
-  const { data: users, isLoading } = useQuery({
+  const { data: users, isLoading, error } = useQuery({
     queryKey: ["kta-users"],
     queryFn: () => list(),
+    retry: false,
   });
 
   const refresh = () => qc.invalidateQueries({ queryKey: ["kta-users"] });
