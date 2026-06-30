@@ -108,17 +108,19 @@ function AdminJobs() {
   });
 
   const del = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("jobs").delete().eq("id", id);
+    mutationFn: async (ids: string[]) => {
+      const { error } = await supabase.from("jobs").delete().in("id", ids);
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: (_d, ids) => {
       qc.invalidateQueries({ queryKey: ["admin-jobs"] });
       qc.invalidateQueries({ queryKey: ["public-jobs"] });
-      toast.success("Job deleted");
+      setSelected(new Set());
+      toast.success(`Deleted ${ids.length} job(s)`);
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
 
   function openNew() { setEditing(emptyJob()); setDialogOpen(true); }
   function openEdit(j: JobRow) {
