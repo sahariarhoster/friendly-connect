@@ -73,6 +73,31 @@ function AdminApplications() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const bulkUpdate = useMutation({
+    mutationFn: async ({ ids, status }: { ids: string[]; status: string }) => {
+      const { error } = await supabase.from("job_applications").update({ status: status as never }).in("id", ids);
+      if (error) throw error;
+    },
+    onSuccess: (_d, v) => {
+      qc.invalidateQueries({ queryKey: ["admin-applications"] });
+      setSelected(new Set());
+      toast.success(`Updated ${v.ids.length} application(s)`);
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const bulkDelete = useMutation({
+    mutationFn: async (ids: string[]) => {
+      const { error } = await supabase.from("job_applications").delete().in("id", ids);
+      if (error) throw error;
+    },
+    onSuccess: (_d, ids) => {
+      qc.invalidateQueries({ queryKey: ["admin-applications"] });
+      setSelected(new Set());
+      toast.success(`Deleted ${ids.length} application(s)`);
+    },
+
+
   const filtered = (apps ?? []).filter((a) => {
     if (statusFilter !== "all" && a.status !== statusFilter) return false;
     if (jobFilter !== "all" && a.job_id !== jobFilter) return false;
