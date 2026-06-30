@@ -4,12 +4,14 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { APPLICATION_STATUSES, STATUS_LABELS } from "@/lib/positions";
 import { PageHeader, EmptyState } from "@/components/PageHeader";
-import { Inbox } from "lucide-react";
+import { Inbox, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+
 
 
 export const Route = createFileRoute("/_authenticated/kta-dash/applications/")({
