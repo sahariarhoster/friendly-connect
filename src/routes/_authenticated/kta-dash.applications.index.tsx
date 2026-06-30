@@ -96,6 +96,10 @@ function AdminApplications() {
       setSelected(new Set());
       toast.success(`Deleted ${ids.length} application(s)`);
     },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+
 
 
   const filtered = (apps ?? []).filter((a) => {
