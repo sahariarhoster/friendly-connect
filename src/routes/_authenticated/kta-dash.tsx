@@ -2,7 +2,7 @@ import { createFileRoute, Outlet, useNavigate, Link, useRouterState } from "@tan
 import { useEffect } from "react";
 
 import { useRoles } from "@/hooks/useRoles";
-import { Briefcase, Inbox, Building2, MapPin } from "lucide-react";
+import { Briefcase, Inbox, Building2, MapPin, Users as UsersIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/kta-dash")({
