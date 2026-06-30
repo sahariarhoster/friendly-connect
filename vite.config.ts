@@ -14,6 +14,10 @@ export default defineConfig({
   },
   nitro: {
     preset: "node-server",
-    noExternals: true,
-  } as { preset: string; noExternals: boolean },
+    // cPanel's Node environment breaks Nitro's file tracer when it sees `tslib`.
+    // Do not fully bundle every package (that breaks Radix SSR); only force `tslib`
+    // into the server bundle and exclude it from Nitro's traced dependency list.
+    noExternals: ["tslib"],
+    traceDeps: ["!tslib"],
+  } as { preset: string; noExternals: string[]; traceDeps: string[] },
 });
