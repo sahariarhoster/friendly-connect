@@ -123,7 +123,8 @@ export function AppShell({ children }: { children: ReactNode }) {
               { to: "/kta-dash/applications", label: "Applications", icon: FileText, badgeKey: "pendingApps" },
               { to: "/kta-dash/departments", label: "Departments", icon: Building2 },
               { to: "/kta-dash/offices", label: "Offices", icon: MapPin },
-            ],
+              { to: "/kta-dash/users", label: "Users", icon: UsersIcon },
+
           },
           {
             label: "Settings",
