@@ -19,7 +19,9 @@ import {
   Home,
   LogIn,
   Sparkles,
+  Users as UsersIcon,
 } from "lucide-react";
+
 
 type NavItem = {
   to: string;
