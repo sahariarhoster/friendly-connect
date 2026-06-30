@@ -38,6 +38,8 @@ function AdminApplications() {
   const qc = useQueryClient();
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [jobFilter, setJobFilter] = useState<string>("all");
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+
 
   const { data: jobs } = useQuery({
     queryKey: ["admin-jobs-list"],
