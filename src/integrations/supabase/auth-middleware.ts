@@ -71,6 +71,8 @@ export const requireSupabaseAuth = createMiddleware({ type: 'function' }).server
       throw new Error('Unauthorized: Invalid token');
     }
 
+    const { default: ws } = await import('ws');
+
     const supabase = createClient<Database>(
       SUPABASE_URL!,
       SUPABASE_PUBLISHABLE_KEY!,
@@ -85,6 +87,9 @@ export const requireSupabaseAuth = createMiddleware({ type: 'function' }).server
           storage: undefined,
           persistSession: false,
           autoRefreshToken: false,
+        },
+        realtime: {
+          transport: ws as unknown as typeof WebSocket,
         },
       }
     );
