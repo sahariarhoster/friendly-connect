@@ -59,6 +59,8 @@ function AdminJobs() {
   const qc = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Partial<JobRow> | null>(null);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+
 
   const { data: jobs, isLoading } = useQuery({
     queryKey: ["admin-jobs"],
