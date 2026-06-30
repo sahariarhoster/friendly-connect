@@ -18,6 +18,7 @@ export default defineConfig({
     // Keep dependencies external for proper CommonJS interop, but exclude `tslib`
     // from Nitro's traced dependency list. The app does not need a separate traced
     // tslib copy when dependencies are installed in the cPanel app directory.
+    exportConditions: ["module"],
     traceDeps: ["!tslib"],
-  } as { preset: string; traceDeps: string[] },
+  } as { preset: string; exportConditions: string[]; traceDeps: string[] },
 });
