@@ -14,5 +14,6 @@ export default defineConfig({
   },
   nitro: {
     preset: "node-server",
-  },
+    noExternals: true,
+  } as { preset: string; noExternals: boolean },
 });
