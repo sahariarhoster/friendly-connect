@@ -72,11 +72,6 @@ function Landing() {
   return (
     <>
       <div className="space-y-10 p-4 sm:p-6 lg:p-8">
-        {/* Internal-only banner */}
-        <div className="flex flex-wrap items-center justify-center gap-2 rounded-full border border-primary/20 bg-primary-soft/60 px-4 py-2 text-xs font-medium text-primary sm:text-sm">
-          <Lock className="h-3.5 w-3.5" />
-          Private recruitment portal — built exclusively for Khatiana. Not affiliated with any third party.
-        </div>
 
         {/* Hero */}
         <section className="relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-primary/15 via-primary-soft/40 to-card p-8 sm:p-12 lg:p-16">
