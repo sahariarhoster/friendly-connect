@@ -16,15 +16,15 @@ import { Route as JobsIndexRouteImport } from './routes/jobs.index'
 import { Route as JobsJobIdRouteImport } from './routes/jobs.$jobId'
 import { Route as ApplyJobIdRouteImport } from './routes/apply.$jobId'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedKtaDashRouteImport } from './routes/_authenticated/kta-dash'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedApplicationsRouteImport } from './routes/_authenticated/applications'
-import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
-import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
-import { Route as AuthenticatedAdminOfficesRouteImport } from './routes/_authenticated/admin.offices'
-import { Route as AuthenticatedAdminJobsRouteImport } from './routes/_authenticated/admin.jobs'
-import { Route as AuthenticatedAdminDepartmentsRouteImport } from './routes/_authenticated/admin.departments'
-import { Route as AuthenticatedAdminApplicationsIndexRouteImport } from './routes/_authenticated/admin.applications.index'
-import { Route as AuthenticatedAdminApplicationsAppIdRouteImport } from './routes/_authenticated/admin.applications.$appId'
+import { Route as AuthenticatedKtaDashIndexRouteImport } from './routes/_authenticated/kta-dash.index'
+import { Route as AuthenticatedKtaDashOfficesRouteImport } from './routes/_authenticated/kta-dash.offices'
+import { Route as AuthenticatedKtaDashJobsRouteImport } from './routes/_authenticated/kta-dash.jobs'
+import { Route as AuthenticatedKtaDashDepartmentsRouteImport } from './routes/_authenticated/kta-dash.departments'
+import { Route as AuthenticatedKtaDashApplicationsIndexRouteImport } from './routes/_authenticated/kta-dash.applications.index'
+import { Route as AuthenticatedKtaDashApplicationsAppIdRouteImport } from './routes/_authenticated/kta-dash.applications.$appId'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -60,6 +60,11 @@ const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedKtaDashRoute = AuthenticatedKtaDashRouteImport.update({
+  id: '/kta-dash',
+  path: '/kta-dash',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -71,62 +76,59 @@ const AuthenticatedApplicationsRoute =
     path: '/applications',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AuthenticatedAdminRoute,
-} as any)
-const AuthenticatedAdminOfficesRoute =
-  AuthenticatedAdminOfficesRouteImport.update({
+const AuthenticatedKtaDashIndexRoute =
+  AuthenticatedKtaDashIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedKtaDashRoute,
+  } as any)
+const AuthenticatedKtaDashOfficesRoute =
+  AuthenticatedKtaDashOfficesRouteImport.update({
     id: '/offices',
     path: '/offices',
-    getParentRoute: () => AuthenticatedAdminRoute,
+    getParentRoute: () => AuthenticatedKtaDashRoute,
   } as any)
-const AuthenticatedAdminJobsRoute = AuthenticatedAdminJobsRouteImport.update({
-  id: '/jobs',
-  path: '/jobs',
-  getParentRoute: () => AuthenticatedAdminRoute,
-} as any)
-const AuthenticatedAdminDepartmentsRoute =
-  AuthenticatedAdminDepartmentsRouteImport.update({
+const AuthenticatedKtaDashJobsRoute =
+  AuthenticatedKtaDashJobsRouteImport.update({
+    id: '/jobs',
+    path: '/jobs',
+    getParentRoute: () => AuthenticatedKtaDashRoute,
+  } as any)
+const AuthenticatedKtaDashDepartmentsRoute =
+  AuthenticatedKtaDashDepartmentsRouteImport.update({
     id: '/departments',
     path: '/departments',
-    getParentRoute: () => AuthenticatedAdminRoute,
+    getParentRoute: () => AuthenticatedKtaDashRoute,
   } as any)
-const AuthenticatedAdminApplicationsIndexRoute =
-  AuthenticatedAdminApplicationsIndexRouteImport.update({
+const AuthenticatedKtaDashApplicationsIndexRoute =
+  AuthenticatedKtaDashApplicationsIndexRouteImport.update({
     id: '/applications/',
     path: '/applications/',
-    getParentRoute: () => AuthenticatedAdminRoute,
+    getParentRoute: () => AuthenticatedKtaDashRoute,
   } as any)
-const AuthenticatedAdminApplicationsAppIdRoute =
-  AuthenticatedAdminApplicationsAppIdRouteImport.update({
+const AuthenticatedKtaDashApplicationsAppIdRoute =
+  AuthenticatedKtaDashApplicationsAppIdRouteImport.update({
     id: '/applications/$appId',
     path: '/applications/$appId',
-    getParentRoute: () => AuthenticatedAdminRoute,
+    getParentRoute: () => AuthenticatedKtaDashRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/applications': typeof AuthenticatedApplicationsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/kta-dash': typeof AuthenticatedKtaDashRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
   '/apply/$jobId': typeof ApplyJobIdRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/jobs/': typeof JobsIndexRoute
-  '/admin/departments': typeof AuthenticatedAdminDepartmentsRoute
-  '/admin/jobs': typeof AuthenticatedAdminJobsRoute
-  '/admin/offices': typeof AuthenticatedAdminOfficesRoute
-  '/admin/': typeof AuthenticatedAdminIndexRoute
-  '/admin/applications/$appId': typeof AuthenticatedAdminApplicationsAppIdRoute
-  '/admin/applications/': typeof AuthenticatedAdminApplicationsIndexRoute
+  '/kta-dash/departments': typeof AuthenticatedKtaDashDepartmentsRoute
+  '/kta-dash/jobs': typeof AuthenticatedKtaDashJobsRoute
+  '/kta-dash/offices': typeof AuthenticatedKtaDashOfficesRoute
+  '/kta-dash/': typeof AuthenticatedKtaDashIndexRoute
+  '/kta-dash/applications/$appId': typeof AuthenticatedKtaDashApplicationsAppIdRoute
+  '/kta-dash/applications/': typeof AuthenticatedKtaDashApplicationsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -137,50 +139,50 @@ export interface FileRoutesByTo {
   '/apply/$jobId': typeof ApplyJobIdRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/jobs': typeof JobsIndexRoute
-  '/admin/departments': typeof AuthenticatedAdminDepartmentsRoute
-  '/admin/jobs': typeof AuthenticatedAdminJobsRoute
-  '/admin/offices': typeof AuthenticatedAdminOfficesRoute
-  '/admin': typeof AuthenticatedAdminIndexRoute
-  '/admin/applications/$appId': typeof AuthenticatedAdminApplicationsAppIdRoute
-  '/admin/applications': typeof AuthenticatedAdminApplicationsIndexRoute
+  '/kta-dash/departments': typeof AuthenticatedKtaDashDepartmentsRoute
+  '/kta-dash/jobs': typeof AuthenticatedKtaDashJobsRoute
+  '/kta-dash/offices': typeof AuthenticatedKtaDashOfficesRoute
+  '/kta-dash': typeof AuthenticatedKtaDashIndexRoute
+  '/kta-dash/applications/$appId': typeof AuthenticatedKtaDashApplicationsAppIdRoute
+  '/kta-dash/applications': typeof AuthenticatedKtaDashApplicationsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
-  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/applications': typeof AuthenticatedApplicationsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/kta-dash': typeof AuthenticatedKtaDashRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/apply/$jobId': typeof ApplyJobIdRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/jobs/': typeof JobsIndexRoute
-  '/_authenticated/admin/departments': typeof AuthenticatedAdminDepartmentsRoute
-  '/_authenticated/admin/jobs': typeof AuthenticatedAdminJobsRoute
-  '/_authenticated/admin/offices': typeof AuthenticatedAdminOfficesRoute
-  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
-  '/_authenticated/admin/applications/$appId': typeof AuthenticatedAdminApplicationsAppIdRoute
-  '/_authenticated/admin/applications/': typeof AuthenticatedAdminApplicationsIndexRoute
+  '/_authenticated/kta-dash/departments': typeof AuthenticatedKtaDashDepartmentsRoute
+  '/_authenticated/kta-dash/jobs': typeof AuthenticatedKtaDashJobsRoute
+  '/_authenticated/kta-dash/offices': typeof AuthenticatedKtaDashOfficesRoute
+  '/_authenticated/kta-dash/': typeof AuthenticatedKtaDashIndexRoute
+  '/_authenticated/kta-dash/applications/$appId': typeof AuthenticatedKtaDashApplicationsAppIdRoute
+  '/_authenticated/kta-dash/applications/': typeof AuthenticatedKtaDashApplicationsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/auth'
-    | '/admin'
     | '/applications'
     | '/dashboard'
+    | '/kta-dash'
     | '/profile'
     | '/apply/$jobId'
     | '/jobs/$jobId'
     | '/jobs/'
-    | '/admin/departments'
-    | '/admin/jobs'
-    | '/admin/offices'
-    | '/admin/'
-    | '/admin/applications/$appId'
-    | '/admin/applications/'
+    | '/kta-dash/departments'
+    | '/kta-dash/jobs'
+    | '/kta-dash/offices'
+    | '/kta-dash/'
+    | '/kta-dash/applications/$appId'
+    | '/kta-dash/applications/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -191,30 +193,30 @@ export interface FileRouteTypes {
     | '/apply/$jobId'
     | '/jobs/$jobId'
     | '/jobs'
-    | '/admin/departments'
-    | '/admin/jobs'
-    | '/admin/offices'
-    | '/admin'
-    | '/admin/applications/$appId'
-    | '/admin/applications'
+    | '/kta-dash/departments'
+    | '/kta-dash/jobs'
+    | '/kta-dash/offices'
+    | '/kta-dash'
+    | '/kta-dash/applications/$appId'
+    | '/kta-dash/applications'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
-    | '/_authenticated/admin'
     | '/_authenticated/applications'
     | '/_authenticated/dashboard'
+    | '/_authenticated/kta-dash'
     | '/_authenticated/profile'
     | '/apply/$jobId'
     | '/jobs/$jobId'
     | '/jobs/'
-    | '/_authenticated/admin/departments'
-    | '/_authenticated/admin/jobs'
-    | '/_authenticated/admin/offices'
-    | '/_authenticated/admin/'
-    | '/_authenticated/admin/applications/$appId'
-    | '/_authenticated/admin/applications/'
+    | '/_authenticated/kta-dash/departments'
+    | '/_authenticated/kta-dash/jobs'
+    | '/_authenticated/kta-dash/offices'
+    | '/_authenticated/kta-dash/'
+    | '/_authenticated/kta-dash/applications/$appId'
+    | '/_authenticated/kta-dash/applications/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -277,6 +279,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/kta-dash': {
+      id: '/_authenticated/kta-dash'
+      path: '/kta-dash'
+      fullPath: '/kta-dash'
+      preLoaderRoute: typeof AuthenticatedKtaDashRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -291,92 +300,85 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedApplicationsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/admin': {
-      id: '/_authenticated/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AuthenticatedAdminRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/admin/': {
-      id: '/_authenticated/admin/'
+    '/_authenticated/kta-dash/': {
+      id: '/_authenticated/kta-dash/'
       path: '/'
-      fullPath: '/admin/'
-      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
+      fullPath: '/kta-dash/'
+      preLoaderRoute: typeof AuthenticatedKtaDashIndexRouteImport
+      parentRoute: typeof AuthenticatedKtaDashRoute
     }
-    '/_authenticated/admin/offices': {
-      id: '/_authenticated/admin/offices'
+    '/_authenticated/kta-dash/offices': {
+      id: '/_authenticated/kta-dash/offices'
       path: '/offices'
-      fullPath: '/admin/offices'
-      preLoaderRoute: typeof AuthenticatedAdminOfficesRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
+      fullPath: '/kta-dash/offices'
+      preLoaderRoute: typeof AuthenticatedKtaDashOfficesRouteImport
+      parentRoute: typeof AuthenticatedKtaDashRoute
     }
-    '/_authenticated/admin/jobs': {
-      id: '/_authenticated/admin/jobs'
+    '/_authenticated/kta-dash/jobs': {
+      id: '/_authenticated/kta-dash/jobs'
       path: '/jobs'
-      fullPath: '/admin/jobs'
-      preLoaderRoute: typeof AuthenticatedAdminJobsRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
+      fullPath: '/kta-dash/jobs'
+      preLoaderRoute: typeof AuthenticatedKtaDashJobsRouteImport
+      parentRoute: typeof AuthenticatedKtaDashRoute
     }
-    '/_authenticated/admin/departments': {
-      id: '/_authenticated/admin/departments'
+    '/_authenticated/kta-dash/departments': {
+      id: '/_authenticated/kta-dash/departments'
       path: '/departments'
-      fullPath: '/admin/departments'
-      preLoaderRoute: typeof AuthenticatedAdminDepartmentsRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
+      fullPath: '/kta-dash/departments'
+      preLoaderRoute: typeof AuthenticatedKtaDashDepartmentsRouteImport
+      parentRoute: typeof AuthenticatedKtaDashRoute
     }
-    '/_authenticated/admin/applications/': {
-      id: '/_authenticated/admin/applications/'
+    '/_authenticated/kta-dash/applications/': {
+      id: '/_authenticated/kta-dash/applications/'
       path: '/applications'
-      fullPath: '/admin/applications/'
-      preLoaderRoute: typeof AuthenticatedAdminApplicationsIndexRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
+      fullPath: '/kta-dash/applications/'
+      preLoaderRoute: typeof AuthenticatedKtaDashApplicationsIndexRouteImport
+      parentRoute: typeof AuthenticatedKtaDashRoute
     }
-    '/_authenticated/admin/applications/$appId': {
-      id: '/_authenticated/admin/applications/$appId'
+    '/_authenticated/kta-dash/applications/$appId': {
+      id: '/_authenticated/kta-dash/applications/$appId'
       path: '/applications/$appId'
-      fullPath: '/admin/applications/$appId'
-      preLoaderRoute: typeof AuthenticatedAdminApplicationsAppIdRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
+      fullPath: '/kta-dash/applications/$appId'
+      preLoaderRoute: typeof AuthenticatedKtaDashApplicationsAppIdRouteImport
+      parentRoute: typeof AuthenticatedKtaDashRoute
     }
   }
 }
 
-interface AuthenticatedAdminRouteChildren {
-  AuthenticatedAdminDepartmentsRoute: typeof AuthenticatedAdminDepartmentsRoute
-  AuthenticatedAdminJobsRoute: typeof AuthenticatedAdminJobsRoute
-  AuthenticatedAdminOfficesRoute: typeof AuthenticatedAdminOfficesRoute
-  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
-  AuthenticatedAdminApplicationsAppIdRoute: typeof AuthenticatedAdminApplicationsAppIdRoute
-  AuthenticatedAdminApplicationsIndexRoute: typeof AuthenticatedAdminApplicationsIndexRoute
+interface AuthenticatedKtaDashRouteChildren {
+  AuthenticatedKtaDashDepartmentsRoute: typeof AuthenticatedKtaDashDepartmentsRoute
+  AuthenticatedKtaDashJobsRoute: typeof AuthenticatedKtaDashJobsRoute
+  AuthenticatedKtaDashOfficesRoute: typeof AuthenticatedKtaDashOfficesRoute
+  AuthenticatedKtaDashIndexRoute: typeof AuthenticatedKtaDashIndexRoute
+  AuthenticatedKtaDashApplicationsAppIdRoute: typeof AuthenticatedKtaDashApplicationsAppIdRoute
+  AuthenticatedKtaDashApplicationsIndexRoute: typeof AuthenticatedKtaDashApplicationsIndexRoute
 }
 
-const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
-  AuthenticatedAdminDepartmentsRoute: AuthenticatedAdminDepartmentsRoute,
-  AuthenticatedAdminJobsRoute: AuthenticatedAdminJobsRoute,
-  AuthenticatedAdminOfficesRoute: AuthenticatedAdminOfficesRoute,
-  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
-  AuthenticatedAdminApplicationsAppIdRoute:
-    AuthenticatedAdminApplicationsAppIdRoute,
-  AuthenticatedAdminApplicationsIndexRoute:
-    AuthenticatedAdminApplicationsIndexRoute,
+const AuthenticatedKtaDashRouteChildren: AuthenticatedKtaDashRouteChildren = {
+  AuthenticatedKtaDashDepartmentsRoute: AuthenticatedKtaDashDepartmentsRoute,
+  AuthenticatedKtaDashJobsRoute: AuthenticatedKtaDashJobsRoute,
+  AuthenticatedKtaDashOfficesRoute: AuthenticatedKtaDashOfficesRoute,
+  AuthenticatedKtaDashIndexRoute: AuthenticatedKtaDashIndexRoute,
+  AuthenticatedKtaDashApplicationsAppIdRoute:
+    AuthenticatedKtaDashApplicationsAppIdRoute,
+  AuthenticatedKtaDashApplicationsIndexRoute:
+    AuthenticatedKtaDashApplicationsIndexRoute,
 }
 
-const AuthenticatedAdminRouteWithChildren =
-  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+const AuthenticatedKtaDashRouteWithChildren =
+  AuthenticatedKtaDashRoute._addFileChildren(AuthenticatedKtaDashRouteChildren)
 
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedApplicationsRoute: typeof AuthenticatedApplicationsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedKtaDashRoute: typeof AuthenticatedKtaDashRouteWithChildren
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedApplicationsRoute: AuthenticatedApplicationsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedKtaDashRoute: AuthenticatedKtaDashRouteWithChildren,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
 }
 

@@ -21,7 +21,7 @@ import { Plus, Pencil, Trash2, Link2, Briefcase, ListChecks, FileText } from "lu
 import { PageHeader, EmptyState } from "@/components/PageHeader";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_authenticated/admin/jobs")({
+export const Route = createFileRoute("/_authenticated/kta-dash/jobs")({
   component: AdminJobs,
 });
 

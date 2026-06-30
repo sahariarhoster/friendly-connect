@@ -12,7 +12,7 @@ import { Inbox } from "lucide-react";
 import { toast } from "sonner";
 
 
-export const Route = createFileRoute("/_authenticated/admin/applications/")({
+export const Route = createFileRoute("/_authenticated/kta-dash/applications/")({
   component: AdminApplications,
 });
 

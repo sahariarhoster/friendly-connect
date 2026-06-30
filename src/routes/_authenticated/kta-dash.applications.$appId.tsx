@@ -9,7 +9,7 @@ import { APPLICATION_STATUSES, STATUS_LABELS } from "@/lib/positions";
 import { ArrowLeft, Mail, Phone, FileText, ExternalLink, UserCircle2, NotebookPen, Trash2, Plus } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_authenticated/admin/applications/$appId")({
+export const Route = createFileRoute("/_authenticated/kta-dash/applications/$appId")({
   component: ApplicationDetail,
 });
 

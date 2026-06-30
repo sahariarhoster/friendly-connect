@@ -5,7 +5,7 @@ import { useRoles } from "@/hooks/useRoles";
 import { Briefcase, Inbox, Building2, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_authenticated/admin")({
+export const Route = createFileRoute("/_authenticated/kta-dash")({
   component: AdminLayout,
 });
 

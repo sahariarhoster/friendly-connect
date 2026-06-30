@@ -12,7 +12,7 @@ import { Plus, Trash2, MapPin } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_authenticated/admin/offices")({
+export const Route = createFileRoute("/_authenticated/kta-dash/offices")({
   component: AdminOffices,
 });
 

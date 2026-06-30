@@ -1,6 +1,6 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/_authenticated/admin/")({
+export const Route = createFileRoute("/_authenticated/kta-dash/")({
   beforeLoad: () => {
     throw redirect({ to: "/admin/jobs" });
   },
